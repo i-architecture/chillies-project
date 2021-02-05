@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!-- status用于控制log4j2本身日志级别 -->
+<Configuration status="INFO">
+
+    <!-- 定义常量 -->
+    <Properties>
+        <!-- 带颜色的Pattern -->
+        <Property name="CONSOLE_PATTERN">%d{yyyy-MM-dd HH:mm:ss.SSS} %highlight{%-5level} %highlight{%pid}{INFO=Magenta,DEBUG=Magenta,ERROR=Magenta,WARN=Magenta} --- [%15.15t] %highlight{%l}{INFO=cyan,DEBUG=cyan,ERROR=cyan,WARN=cyan} %m%n%xEx</Property>
+
+    </Properties>
+
+    <!-- 日志输出源 -->
+    <Appenders>
+        <!-- 控台输出 -->
+        <Console name="Console" target="SYSTEM_OUT">
+            <PatternLayout pattern="${CONSOLE_PATTERN}"/>
+        </Console>
+
+    </Appenders>
+
+    <Loggers>
+        <Root level="info">
+            <AppenderRef ref="Console"/>
+        </Root>
+
+    </Loggers>
+</Configuration>

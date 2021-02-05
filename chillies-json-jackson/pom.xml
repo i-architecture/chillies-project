@@ -1,0 +1,55 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+    <parent>
+        <artifactId>chillies-parent</artifactId>
+        <groupId>com.ijiagoushi.chillies</groupId>
+        <version>0.0.1-SNAPSHOT</version>
+    </parent>
+    <modelVersion>4.0.0</modelVersion>
+
+    <artifactId>chillies-json-jackson</artifactId>
+
+    <packaging>jar</packaging>
+
+    <name>Chillies JSON Jackson</name>
+    <description>定义了JSON的Jackson实现</description>
+    <url>https://github.com/i-architecture/chillies-project/chillies-json-jackson</url>
+
+    <developers>
+        <developer>
+            <id>author</id>
+            <name>Miles</name>
+            <email>ijiagoushi@outlook.com</email>
+            <url>https://github.com/i-architecture</url>
+            <timezone>+8</timezone>
+        </developer>
+    </developers>
+
+    <licenses>
+        <license>
+            <name>Mulan Permissive Software License，Version 1</name>
+            <url>http://license.coscl.org.cn/MulanPSL</url>
+        </license>
+    </licenses>
+
+    <dependencies>
+        <dependency>
+            <groupId>com.ijiagoushi.chillies</groupId>
+            <artifactId>chillies-json-api</artifactId>
+        </dependency>
+
+        <!-- jackson -->
+        <dependency>
+            <groupId>com.fasterxml.jackson.core</groupId>
+            <artifactId>jackson-databind</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>com.fasterxml.jackson.datatype</groupId>
+            <artifactId>jackson-datatype-jsr310</artifactId>
+        </dependency>
+
+    </dependencies>
+
+</project>
