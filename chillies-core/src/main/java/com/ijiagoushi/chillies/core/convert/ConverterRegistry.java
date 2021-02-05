@@ -1,0 +1,198 @@
+package com.ijiagoushi.chillies.core.convert;
+
+import com.ijiagoushi.chillies.core.bean.BeanUtil;
+import com.ijiagoushi.chillies.core.exceptions.ConverterRuntimeException;
+import com.ijiagoushi.chillies.core.lang.StringUtil;
+import com.ijiagoushi.chillies.core.utils.ReflectUtil;
+import com.ijiagoushi.chillies.core.utils.TypeUtil;
+import org.jetbrains.annotations.Nullable;
+
+import java.io.Serializable;
+import java.math.BigDecimal;
+import java.math.BigInteger;
+import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
+
+/**
+ * 转换器服务
+ *
+ * @author miles.tang
+ */
+public class ConverterRegistry implements Serializable {
+
+    private Map<Class<?>, Converter<?, ?>> builtin;
+
+    private Map<Class<?>, Converter<?, ?>> custom;
+
+
+    private ConverterRegistry() {
+        this.initBuiltIn();
+    }
+
+    private void initBuiltIn() {
+        builtin = new ConcurrentHashMap<>(32);
+        custom = new ConcurrentHashMap<>(32);
+
+        // 原始类型转换器
+        builtin.put(boolean.class, BooleanConverter.getInstance());
+        builtin.put(byte.class, ByteConverter.getInstance());
+        builtin.put(short.class, ShortConverter.getInstance());
+        builtin.put(int.class, IntegerConverter.getInstance());
+        builtin.put(long.class, LongConverter.getInstance());
+        builtin.put(float.class, FloatConverter.getInstance());
+        builtin.put(double.class, DoubleConverter.getInstance());
+        builtin.put(char.class, CharacterConverter.getInstance());
+
+        // 包装类转换器
+        builtin.put(Boolean.class, BooleanConverter.getInstance());
+        builtin.put(Byte.class, ByteConverter.getInstance());
+        builtin.put(Short.class, ShortConverter.getInstance());
+        builtin.put(Integer.class, IntegerConverter.getInstance());
+        builtin.put(Long.class, LongConverter.getInstance());
+        builtin.put(Float.class, FloatConverter.getInstance());
+        builtin.put(Double.class, DoubleConverter.getInstance());
+        builtin.put(Character.class, CharacterConverter.getInstance());
+        builtin.put(BigDecimal.class, BigDecimalConverter.getInstance());
+        builtin.put(BigInteger.class, BigIntegerConverter.getInstance());
+
+    }
+
+    /**
+     * 注册一个自定义类型转换器
+     *
+     * @param clazz     类型
+     * @param converter 对应的转换器
+     */
+    public ConverterRegistry register(Class<?> clazz, Converter<Object, ?> converter) {
+        custom.put(clazz, converter);
+        return this;
+    }
+
+    /**
+     * 注册一个自定义类型转换器
+     *
+     * @param clazz          类型
+     * @param converterClass 对应的转换器
+     */
+    public ConverterRegistry register(Class<?> clazz, Class<? extends Converter<Object, ?>> converterClass) {
+        return register(clazz, ReflectUtil.newInstance(converterClass));
+    }
+
+    /**
+     * 获得转换器
+     *
+     * @param clazz       类型
+     * @param customFirst 优先返回自定义注册器
+     * @param <T>         目标类型
+     * @return 转换器
+     */
+    @SuppressWarnings("unchecked")
+    @Nullable
+    public <T> Converter<Object, T> getConverter(Class<T> clazz, boolean customFirst) {
+        Converter<Object, T> result = null;
+        if (customFirst) {
+            result = (Converter<Object, T>) custom.get(clazz);
+        }
+        if (result == null) {
+            result = (Converter<Object, T>) builtin.get(clazz);
+        }
+        return result;
+    }
+
+    /**
+     * 获取默认转换器
+     *
+     * @param clazz 类型
+     * @param <T>   目标类型
+     * @return 默认转换器
+     */
+    @Nullable
+    public <T> Converter<?, T> getDefaultConverter(Class<T> clazz) {
+        return getConverter(clazz, false);
+    }
+
+    /**
+     * 获取自定义转换器
+     *
+     * @param clazz 类型
+     * @param <T>   目标类型
+     * @return 自定义转换器
+     */
+    @Nullable
+    public <T> Converter<?, T> getCustomConverter(Class<T> clazz) {
+        return getConverter(clazz, true);
+    }
+
+    /**
+     * 将原对象转为目标类型的对象
+     *
+     * @param value       源对象
+     * @param targetClass 目标对象类型
+     * @param <T>         泛型类
+     * @return 目标对象
+     * @throws ConverterRuntimeException 转换异常
+     */
+    public <T> T convert(Object value, Class<T> targetClass) throws ConverterRuntimeException {
+        return convert(value, targetClass, null);
+    }
+
+    /**
+     * 将原对象转为目标类型的对象
+     *
+     * @param value        源对象
+     * @param targetClass  目标对象类型
+     * @param <T>          泛型类
+     * @param defaultValue 默认值
+     * @return 目标对象
+     * @throws ConverterRuntimeException 转换异常
+     */
+    public <T> T convert(Object value, Class<T> targetClass, T defaultValue) throws ConverterRuntimeException {
+        return convert(value, targetClass, defaultValue, true);
+    }
+
+    /**
+     * 将原对象转为目标类型的对象
+     *
+     * @param value        源对象
+     * @param targetClass  目标对象类型
+     * @param <T>          泛型类
+     * @param defaultValue 默认值
+     * @param customFirst  优先返回自定义注册器
+     * @return 目标对象
+     * @throws ConverterRuntimeException 转换异常
+     */
+    @SuppressWarnings("unchecked")
+    public <T> T convert(Object value, Class<T> targetClass, T defaultValue, boolean customFirst) throws ConverterRuntimeException {
+        if (TypeUtil.isUnknown(targetClass) && null == defaultValue) {
+            return (T) value;
+        }
+        if (value == null) {
+            return defaultValue;
+        }
+        if (TypeUtil.isUnknown(targetClass)) {
+            targetClass = (Class<T>) defaultValue.getClass();
+        }
+
+        Converter<Object, T> converter = getConverter(targetClass, customFirst);
+        if (converter != null) {
+            return converter.exec(value, defaultValue);
+        }
+
+        // 尝试转Bean
+        if (BeanUtil.isBeanType(targetClass)) {
+            return new BeanConverter<>(targetClass).exec(value, defaultValue);
+        }
+
+        //
+        throw new ConverterRuntimeException(4, StringUtil.format("Can not Converter from [{}] to [{}]", value.getClass(), targetClass));
+    }
+
+    private static class Holder {
+        static final ConverterRegistry INSTANCE = new ConverterRegistry();
+    }
+
+    public static ConverterRegistry getInstance() {
+        return Holder.INSTANCE;
+    }
+
+}
