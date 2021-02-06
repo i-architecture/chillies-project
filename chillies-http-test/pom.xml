@@ -22,8 +22,8 @@
 
         <dependency>
             <groupId>com.ijiagoushi.chillies</groupId>
-            <artifactId>chillies-http-okhttp</artifactId>
-        </dependency> <!-- chillies-http-okhttp -->
+            <artifactId>chillies-http-apachehttpclient</artifactId>
+        </dependency> <!-- chillies-http-apachehttpclient -->
 
         <dependency>
             <groupId>org.apache.logging.log4j</groupId>

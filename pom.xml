@@ -64,6 +64,7 @@
         <module>chillies-http-api</module>
         <module>chillies-http-okhttp</module>
         <module>chillies-http-test</module>
+        <module>chillies-http-apachehttpclient</module>
     </modules>
 
     <dependencyManagement>
@@ -162,6 +163,21 @@
                 <artifactId>okhttp</artifactId>
                 <version>${okhttp3.version}</version>
             </dependency> <!-- okhttp -->
+            <dependency>
+                <groupId>com.ijiagoushi.chillies</groupId>
+                <artifactId>chillies-http-apachehttpclient</artifactId>
+                <version>${chillies-project.version}</version>
+            </dependency> <!-- chillies-http-apachehttpclient -->
+            <dependency>
+                <groupId>org.apache.httpcomponents</groupId>
+                <artifactId>httpclient</artifactId>
+                <version>${apache-httpclient.version}</version>
+            </dependency> <!-- httpclient -->
+            <dependency>
+                <groupId>org.apache.httpcomponents</groupId>
+                <artifactId>httpmime</artifactId>
+                <version>${apache-httpclient.version}</version>
+            </dependency> <!-- httpmime -->
             <!-- endregion -->
 
         </dependencies>

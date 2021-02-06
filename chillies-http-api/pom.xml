@@ -18,6 +18,10 @@
             <groupId>com.ijiagoushi.chillies</groupId>
             <artifactId>chillies-json-api</artifactId>
         </dependency>
+        <dependency>
+            <groupId>com.ijiagoushi.chillies</groupId>
+            <artifactId>chillies-json-gson</artifactId>
+        </dependency>
     </dependencies>
 
     <build>
