@@ -164,7 +164,8 @@ public class JSONUtil {
      * @return JSON引擎
      */
     private static JSON getJSON(JSON json) {
-        return json != null ? json : defaultJson;
+        JSON result = json != null ? json : defaultJson;
+        return Preconditions.requireNonNull(result, "JSON Provider Cannot find!");
     }
 
 }

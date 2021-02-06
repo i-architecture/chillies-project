@@ -5,6 +5,9 @@ import com.ijiagoushi.chillies.core.lang.CharsetUtil;
 import com.ijiagoushi.chillies.core.lang.CollectionUtil;
 import com.ijiagoushi.chillies.core.lang.Preconditions;
 import com.ijiagoushi.chillies.core.lang.StringUtil;
+import com.ijiagoushi.chillies.core.map.MultiValueLinkedMap;
+import com.ijiagoushi.chillies.core.map.MultiValueMap;
+import org.jetbrains.annotations.NotNull;
 
 import java.io.File;
 import java.io.IOException;
@@ -12,6 +15,7 @@ import java.io.InputStream;
 import java.io.UnsupportedEncodingException;
 import java.net.*;
 import java.nio.charset.Charset;
+import java.util.List;
 import java.util.Map;
 import java.util.function.BiConsumer;
 import java.util.function.Consumer;
@@ -243,6 +247,37 @@ public class UrlUtil {
         } catch (IOException e) {
             throw new IoRuntimeException(e);
         }
+    }
+
+    /**
+     * <p>将url中的请求参数转为Map对象</p>
+     *
+     * @param urlParamStr url请求参数
+     * @return 返回Map对象
+     */
+    @NotNull
+    public static MultiValueMap<String, String> parseUrlParams(@NotNull String urlParamStr) {
+        MultiValueMap<String, String> multiValueMap = new MultiValueLinkedMap<>();
+        if (urlParamStr.length() == 0) {
+            return multiValueMap;
+        }
+        List<String> urlParamList = StringUtil.splitToList(urlParamStr, StringUtil.AMP);
+        if (CollectionUtil.isEmpty(urlParamList)) {
+            return multiValueMap;
+        }
+
+        String[] array;
+        for (String urlParam : urlParamList) {
+            if (StringUtil.hasText(urlParam)) {
+                array = StringUtil.split(urlParam, StringUtil.EQUALS, true, true);
+                if (array.length == 2) {
+                    multiValueMap.add(array[0], array[1]);
+                } else {
+                    multiValueMap.add(array[0], null);
+                }
+            }
+        }
+        return multiValueMap;
     }
 
 }

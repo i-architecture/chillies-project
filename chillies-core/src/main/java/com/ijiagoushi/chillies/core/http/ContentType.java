@@ -39,6 +39,8 @@ public final class ContentType implements Serializable {
     // application
     public static final ContentType APPLICATION_JSON;
     public static final ContentType APPLICATION_XML;
+    public static final ContentType APPLICATION_HTML;
+    public static final ContentType APPLICATION_JAVASCRIPT;
 
     //imgage
     public static final ContentType IMAGE_PNG;
@@ -83,6 +85,8 @@ public final class ContentType implements Serializable {
         APPLICATION_OCTET_STREAM = new ContentType("application", "octet-stream", null);
         APPLICATION_JSON = new ContentType("application", "json", CharsetUtil.UTF_8);
         APPLICATION_XML = new ContentType("application", "xml", null);
+        APPLICATION_HTML = new ContentType("application", "html", null);
+        APPLICATION_JAVASCRIPT = new ContentType("application", "javascript", null);
 
         IMAGE_PNG = new ContentType("image", "png", null);
         IMAGE_GIF = new ContentType("image", "gif", null);

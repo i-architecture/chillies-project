@@ -30,6 +30,9 @@
         <jackson2.version>2.10.3</jackson2.version>
         <!-- endregion -->
 
+        <okhttp3.version>3.14.7</okhttp3.version>
+        <apache-httpclient.version>4.5.12</apache-httpclient.version>
+
     </properties>
 
     <licenses>
@@ -58,6 +61,9 @@
         <module>chillies-json-gson</module>
         <module>chillies-json-fastjson</module>
         <module>chillies-json-test</module>
+        <module>chillies-http-api</module>
+        <module>chillies-http-okhttp</module>
+        <module>chillies-http-test</module>
     </modules>
 
     <dependencyManagement>
@@ -138,6 +144,24 @@
                 <version>${chillies-project.version}</version>
             </dependency> <!-- chillies-json-jackson -->
 
+            <!-- endregion -->
+
+            <!-- region http -->
+            <dependency>
+                <groupId>com.ijiagoushi.chillies</groupId>
+                <artifactId>chillies-http-api</artifactId>
+                <version>${chillies-project.version}</version>
+            </dependency> <!-- chillies-http-api -->
+            <dependency>
+                <groupId>com.ijiagoushi.chillies</groupId>
+                <artifactId>chillies-http-okhttp</artifactId>
+                <version>${chillies-project.version}</version>
+            </dependency> <!-- chillies-http-okhttp -->
+            <dependency>
+                <groupId>com.squareup.okhttp3</groupId>
+                <artifactId>okhttp</artifactId>
+                <version>${okhttp3.version}</version>
+            </dependency> <!-- okhttp -->
             <!-- endregion -->
 
         </dependencies>

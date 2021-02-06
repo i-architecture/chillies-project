@@ -1,12 +1,7 @@
 package com.ijiagoushi.chillies.core.lang;
 
-import com.ijiagoushi.chillies.core.map.MultiValueLinkedMap;
-import com.ijiagoushi.chillies.core.map.MultiValueMap;
-import org.jetbrains.annotations.NotNull;
-
 import java.util.HashMap;
 import java.util.LinkedHashMap;
-import java.util.List;
 import java.util.Map;
 
 /**
@@ -46,37 +41,6 @@ public class MapUtil {
      */
     public static <K, V> LinkedHashMap<K, V> newLinkedHashMap(int expectedSize) {
         return new LinkedHashMap<>((int) (expectedSize / DEFAULT_LOAD_FACTOR), DEFAULT_LOAD_FACTOR);
-    }
-
-    /**
-     * <p>将url中的请求参数转为Map对象</p>
-     *
-     * @param urlParamStr url请求参数
-     * @return 返回Map对象
-     */
-    @NotNull
-    public static MultiValueMap<String, String> fromUrlParams(@NotNull String urlParamStr) {
-        MultiValueMap<String, String> multiValueMap = new MultiValueLinkedMap<>();
-        if (urlParamStr.length() == 0) {
-            return multiValueMap;
-        }
-        List<String> urlParamList = StringUtil.splitToList(urlParamStr, StringUtil.AMP);
-        if (CollectionUtil.isEmpty(urlParamList)) {
-            return multiValueMap;
-        }
-
-        String[] array;
-        for (String urlParam : urlParamList) {
-            if (StringUtil.hasText(urlParam)) {
-                array = StringUtil.split(urlParam, StringUtil.EQUALS, true, true);
-                if (array.length == 2) {
-                    multiValueMap.add(array[0], array[1]);
-                } else {
-                    multiValueMap.add(array[0], null);
-                }
-            }
-        }
-        return multiValueMap;
     }
 
     /**
