@@ -97,4 +97,39 @@ public class ResponseUtil {
         write(html, ContentType.TEXT_HTML.charset(encoding), response);
     }
 
+
+    /**
+     * 对浏览器输出文本内容
+     *
+     * @param data     待输出的字符串
+     * @param response {@linkplain HttpServletResponse}
+     */
+    public static void writePlainText(@NotNull String data, @NotNull HttpServletResponse response) {
+        writePlainText(data, response, null);
+    }
+
+    /**
+     * 对浏览器输出文本内容
+     *
+     * @param data     待输出的字符串
+     * @param response {@linkplain HttpServletResponse}
+     * @param encoding 编码
+     */
+    public static void writePlainText(@NotNull String data, @NotNull HttpServletResponse response, @Nullable Charset encoding) {
+        Preconditions.requireNotEmpty(data, "data is null or empty");
+        Preconditions.requireNonNull(response, "response == null");
+        encoding = CharsetUtil.getCharset(encoding, CharsetUtil.UTF_8);
+        write(data, ContentType.TEXT_PLAIN.charset(encoding), response);
+    }
+
+    /**
+     * 对浏览器输出文本内容
+     *
+     * @param data     待输出的对象，最终会转为JSON字符串
+     * @param response {@linkplain HttpServletResponse}
+     */
+    public static void writePlainText(@NotNull Object data, @NotNull HttpServletResponse response) {
+        writePlainText(JSONUtil.toJson(data), response);
+    }
+
 }
