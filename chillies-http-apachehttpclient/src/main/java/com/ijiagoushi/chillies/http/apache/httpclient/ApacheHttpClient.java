@@ -169,7 +169,7 @@ public class ApacheHttpClient implements HttpClient {
                         .setContentType(contentType)
                         .setMode(HttpMultipartMode.BROWSER_COMPATIBLE);
                 for (HttpMultipartBody.Part part : multipartBody.getParts()) {
-                    ContentType partContentType = ContentType.create(part.getContentType().toString());
+                    ContentType partContentType = ContentType.parse(part.getContentType().toString());
                     if (part.getFile() != null) {
                         multipartEntityBuilder.addBinaryBody(part.getName(), part.getFile());
                     } else if (part.getIn() != null) {
