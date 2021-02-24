@@ -72,4 +72,29 @@ public class ResponseUtil {
         }
     }
 
+
+    /**
+     * 对浏览器输出HTML片段
+     *
+     * @param html     待输出的内容
+     * @param response {@linkplain HttpServletResponse}
+     */
+    public static void writeHtml(@NotNull String html, @NotNull HttpServletResponse response) {
+        writeHtml(html, response, null);
+    }
+
+    /**
+     * 对浏览器输出HTML片段
+     *
+     * @param html     待输出的内容
+     * @param response {@linkplain HttpServletResponse}
+     * @param encoding 字符集编码
+     */
+    public static void writeHtml(@NotNull String html, @NotNull HttpServletResponse response, @Nullable Charset encoding) {
+        Preconditions.requireNotEmpty(html, "html is null or empty");
+        Preconditions.requireNonNull(response, "response == null");
+        encoding = CharsetUtil.getCharset(encoding, CharsetUtil.UTF_8);
+        write(html, ContentType.TEXT_HTML.charset(encoding), response);
+    }
+
 }
