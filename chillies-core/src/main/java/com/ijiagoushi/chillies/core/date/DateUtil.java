@@ -46,7 +46,7 @@ public class DateUtil {
      * @param formatter     格式化规则
      * @return 格式化后的日期字符串
      */
-    public static String format( LocalDateTime localDateTime,  DateTimeFormatter formatter) {
+    public static String format(LocalDateTime localDateTime, DateTimeFormatter formatter) {
         if (localDateTime == null || formatter == null) {
             return null;
         }
@@ -60,7 +60,7 @@ public class DateUtil {
      * @param formatter 格式化规则
      * @return 格式化后的日期字符串
      */
-    public static String format( LocalDate localDate,  DateTimeFormatter formatter) {
+    public static String format(LocalDate localDate, DateTimeFormatter formatter) {
         if (localDate == null || formatter == null) {
             return null;
         }
@@ -74,7 +74,7 @@ public class DateUtil {
      * @param formatter 格式化规则
      * @return 格式化后的日期字符串
      */
-    public static String format( LocalTime localTime,  DateTimeFormatter formatter) {
+    public static String format(LocalTime localTime, DateTimeFormatter formatter) {
         if (localTime == null || formatter == null) {
             return null;
         }
@@ -134,7 +134,7 @@ public class DateUtil {
      * @param date 日期对象
      * @return 日期字符串
      */
-    public static String formatToDate( final Date date) {
+    public static String formatToDate(final Date date) {
         return format(DateConverter.toLocalDate(date));
     }
 
@@ -144,7 +144,7 @@ public class DateUtil {
      * @param date 日期对象
      * @return 日期字符串
      */
-    public static String formatToDateTime( final Date date) {
+    public static String formatToDateTime(final Date date) {
         return format(DateConverter.to(date));
     }
 
@@ -154,7 +154,7 @@ public class DateUtil {
      * @param pattern 格式化规则
      * @return 日期字符串
      */
-    public static String format( String pattern) {
+    public static String format(String pattern) {
         if (StringUtil.isEmpty(pattern)) {
             return null;
         }
@@ -172,7 +172,7 @@ public class DateUtil {
         return CustomFormatterCache.format(DateConverter.to(epochMilliSeconds), pattern);
     }
 
-    public static String format(final long epochMilliSeconds,  DateTimeFormatter formatter) {
+    public static String format(final long epochMilliSeconds, DateTimeFormatter formatter) {
         if (formatter == null) {
             return null;
         }
@@ -187,7 +187,7 @@ public class DateUtil {
      * @param pattern 格式化规则
      * @return 日期字符串
      */
-    public static String format( Date date,  String pattern) {
+    public static String format(Date date, String pattern) {
         if (date == null || StringUtil.isEmpty(pattern)) {
             return null;
         }
@@ -203,7 +203,7 @@ public class DateUtil {
      * @param destPattern 转换的日期格式化规则
      * @return 转换后的日期字符串
      */
-    public static String swapFormat( String text,  String srcPattern,  String destPattern) {
+    public static String swapFormat(String text, String srcPattern, String destPattern) {
         if (StringUtil.isEmpty(text) || StringUtil.isEmpty(srcPattern) || StringUtil.isEmpty(destPattern)) {
             return null;
         }
@@ -228,7 +228,7 @@ public class DateUtil {
      * @param localDate 日期
      * @return 格式化后的日期字符串
      */
-    public static String format( LocalDate localDate) {
+    public static String format(LocalDate localDate) {
         if (localDate == null) {
             return null;
         }
@@ -242,7 +242,7 @@ public class DateUtil {
      * @param pattern   格式化规则
      * @return 格式化后的日期字符串
      */
-    public static String format( LocalDate localDate,  String pattern) {
+    public static String format(LocalDate localDate, String pattern) {
         if (localDate == null || StringUtil.isEmpty(pattern)) {
             return null;
         }
@@ -255,7 +255,7 @@ public class DateUtil {
      * @param localDateTime 日期
      * @return 格式化后的日期字符串
      */
-    public static String format( LocalDateTime localDateTime) {
+    public static String format(LocalDateTime localDateTime) {
         return format(localDateTime, DatePattern.NORMAL_DATETIME_FORMATTER);
     }
 
@@ -266,7 +266,7 @@ public class DateUtil {
      * @param pattern       格式化规则
      * @return 格式化后的日期字符串
      */
-    public static String format( LocalDateTime localDateTime,  String pattern) {
+    public static String format(LocalDateTime localDateTime, String pattern) {
         if (localDateTime == null || StringUtil.isEmpty(pattern)) {
             return null;
         }
@@ -278,22 +278,12 @@ public class DateUtil {
     //region parse method
 
     /**
-     * 解析日期字符串,解析规则: yyyy-MM-dd
-     *
-     * @param strDate 日期字符串
-     * @return 解析后的日期
-     */
-    public static Date parseToDate( String strDate) {
-        return DateConverter.from(parseToLocalDate(strDate));
-    }
-
-    /**
      * 解析日期字符串,解析规则: yyyy-MM-dd HH:mm:ss
      *
      * @param strDate 日期字符串
      * @return 解析后的日期
      */
-    public static Date parseToDateTime( String strDate) {
+    public static Date parseToUtilDate(String strDate) {
         return DateConverter.from(parseToLocalDateTime(strDate));
     }
 
@@ -305,7 +295,7 @@ public class DateUtil {
      * @param pattern 解析规则
      * @return 日期对象
      */
-    public static Date parseToJUDate(final String strDate, final String pattern) {
+    public static Date parseToUtilDate(final String strDate, final String pattern) {
         if (StringUtil.isAnyEmpty(strDate, pattern)) {
             return null;
         }
@@ -352,7 +342,7 @@ public class DateUtil {
      * @param strDate 日期字符串
      * @return 解析后的日期
      */
-    public static LocalDate parseToLocalDate( String strDate) {
+    public static LocalDate parseToLocalDate(String strDate) {
         return parseToLocalDate(strDate, DatePattern.SMART_NORMAL_DATE_FORMATTER);
     }
 
@@ -363,7 +353,7 @@ public class DateUtil {
      * @param pattern 自定义日期格式
      * @return 解析后的日期
      */
-    public static LocalDate parseToLocalDate( String strDate,  String pattern) {
+    public static LocalDate parseToLocalDate(String strDate, String pattern) {
         if (StringUtil.isAnyEmpty(strDate, pattern)) {
             return null;
         }
@@ -377,7 +367,7 @@ public class DateUtil {
      * @param strDate 日期字符串
      * @return 解析后的日期
      */
-    public static LocalDate parseToLocalDate( String strDate,  DateTimeFormatter formatter) {
+    public static LocalDate parseToLocalDate(String strDate, DateTimeFormatter formatter) {
         if (StringUtil.isEmpty(strDate) || formatter == null) {
             return null;
         }
@@ -390,7 +380,7 @@ public class DateUtil {
      * @param strDate 日期字符串
      * @return 解析后的日期
      */
-    public static LocalDateTime parseToLocalDateTime( String strDate) {
+    public static LocalDateTime parseToLocalDateTime(String strDate) {
         return parseToLocalDateTime(strDate, DatePattern.SMART_NORMAL_DATETIME_FORMATTER);
     }
 
@@ -401,7 +391,7 @@ public class DateUtil {
      * @param pattern 自定义日期格式
      * @return 解析后的日期
      */
-    public static LocalDateTime parseToLocalDateTime( String strDate,  String pattern) {
+    public static LocalDateTime parseToLocalDateTime(String strDate, String pattern) {
         if (StringUtil.isAnyEmpty(strDate, pattern)) {
             return null;
         }
@@ -416,13 +406,16 @@ public class DateUtil {
      * @param formatter 自定义日期格式
      * @return 解析后的日期
      */
-    public static LocalDateTime parseToLocalDateTime( String strDate,  DateTimeFormatter formatter) {
+    public static LocalDateTime parseToLocalDateTime(String strDate, DateTimeFormatter formatter) {
         if (StringUtil.isEmpty(strDate) || formatter == null) {
             return null;
         }
         return LocalDateTime.parse(strDate, formatter);
     }
 
+    // endregion
+
+    // region Of Method
 
     /**
      * 根据年月日创建一个{@linkplain Date}对象
@@ -432,8 +425,8 @@ public class DateUtil {
      * @param dayOfMonth 日
      * @return 日期对象
      */
-    public static Date ofDate(final int year, final int month, final int dayOfMonth) {
-        return ofDate(year, month, dayOfMonth, 0);
+    public static Date ofUtilDate(final int year, final int month, final int dayOfMonth) {
+        return ofUtilDate(year, month, dayOfMonth, 0);
     }
 
     /**
@@ -445,8 +438,8 @@ public class DateUtil {
      * @param hour       小时
      * @return 日期对象
      */
-    public static Date ofDate(final int year, final int month, final int dayOfMonth, final int hour) {
-        return ofDate(year, month, dayOfMonth, hour, 0);
+    public static Date ofUtilDate(final int year, final int month, final int dayOfMonth, final int hour) {
+        return ofUtilDate(year, month, dayOfMonth, hour, 0);
     }
 
     /**
@@ -459,9 +452,9 @@ public class DateUtil {
      * @param minute     分
      * @return 日期对象
      */
-    public static Date ofDate(final int year, final int month, final int dayOfMonth,
-                              final int hour, final int minute) {
-        return ofDate(year, month, dayOfMonth, hour, minute, 0);
+    public static Date ofUtilDate(final int year, final int month, final int dayOfMonth,
+                                  final int hour, final int minute) {
+        return ofUtilDate(year, month, dayOfMonth, hour, minute, 0);
     }
 
     /**
@@ -475,8 +468,8 @@ public class DateUtil {
      * @param second     秒
      * @return 日期对象
      */
-    public static Date ofDate(final int year, final int month, final int dayOfMonth,
-                              final int hour, final int minute, final int second) {
+    public static Date ofUtilDate(final int year, final int month, final int dayOfMonth,
+                                  final int hour, final int minute, final int second) {
         LocalDateTime localDateTime = LocalDateTime.of(year, month, dayOfMonth, hour, minute, second);
         return DateConverter.from(localDateTime);
     }
@@ -512,7 +505,7 @@ public class DateUtil {
      * @param date 日期对象
      * @return 年份
      */
-    public static int getYear( Date date) {
+    public static int getYear(Date date) {
         LocalDateTime localDateTime = DateConverter.to(Preconditions.requireNonNull(date, "date == null"));
         return localDateTime.getYear();
     }
@@ -526,7 +519,7 @@ public class DateUtil {
      * @param date 日期对象
      * @return 月份
      */
-    public static int getMonth( Date date) {
+    public static int getMonth(Date date) {
         LocalDateTime localDateTime = DateConverter.to(Preconditions.requireNonNull(date, "date == null"));
         return localDateTime.getMonthValue();
     }
@@ -540,7 +533,7 @@ public class DateUtil {
      * @param date 日期对象
      * @return 天
      */
-    public static int getDay( Date date) {
+    public static int getDay(Date date) {
         LocalDateTime localDateTime = DateConverter.to(Preconditions.requireNonNull(date, "date == null"));
         return localDateTime.getDayOfMonth();
     }
@@ -554,7 +547,7 @@ public class DateUtil {
      * @param date 日期对象
      * @return 小时（24制）
      */
-    public static int get24Hour( Date date) {
+    public static int get24Hour(Date date) {
         LocalDateTime localDateTime = DateConverter.to(Preconditions.requireNonNull(date, "date == null"));
         return localDateTime.getHour();
     }
@@ -568,7 +561,7 @@ public class DateUtil {
      * @param date 日期对象
      * @return 小时（12制）
      */
-    public static int get12Hour( Date date) {
+    public static int get12Hour(Date date) {
         return get24Hour(Preconditions.requireNonNull(date, "date == null")) % 12;
     }
 
@@ -581,7 +574,7 @@ public class DateUtil {
      * @param date 日期对象
      * @return 分钟
      */
-    public static int getMinute( Date date) {
+    public static int getMinute(Date date) {
         LocalDateTime localDateTime = DateConverter.to(Preconditions.requireNonNull(date, "date == null"));
         return localDateTime.getMinute();
     }
@@ -595,12 +588,12 @@ public class DateUtil {
      * @param date 日期对象
      * @return 秒数
      */
-    public static int getSecond( Date date) {
+    public static int getSecond(Date date) {
         LocalDateTime localDateTime = DateConverter.to(Preconditions.requireNonNull(date, "date == null"));
         return localDateTime.getSecond();
     }
 
-    public static int getMilliSecond( Date date) {
+    public static int getMilliSecond(Date date) {
         LocalDateTime localDateTime = DateConverter.to(Preconditions.requireNonNull(date, "date == null"));
         return localDateTime.get(ChronoField.MILLI_OF_SECOND);
     }

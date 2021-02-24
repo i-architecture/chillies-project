@@ -11,6 +11,7 @@ import java.util.Map;
  * @since 1.0
  */
 public class MapUtil {
+
     /**
      * Default load factor for {@link HashMap}/{@link LinkedHashMap} variants.
      *
@@ -99,7 +100,6 @@ public class MapUtil {
     public static Double getDouble(Map<?, ?> map, Object key) {
         return get(map, key, Double.class);
     }
-
 
     /**
      * 获取Map指定key的值，并转换为Double

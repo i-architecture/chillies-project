@@ -182,14 +182,14 @@ public class DateUtilTest {
 
     @Test
     public void formatToDateForLong() {
-        Date date = DateUtil.ofDate(2018, 2, 28);
+        Date date = DateUtil.ofUtilDate(2018, 2, 28);
         String formatToDate = DateUtil.formatToDate(date.getTime());
         assertEquals(formatToDate, "2018-02-28");
     }
 
     @Test
     public void formatToDateTimeForLong() {
-        Date date = DateUtil.ofDate(2018, 2, 28, 18, 0, 0);
+        Date date = DateUtil.ofUtilDate(2018, 2, 28, 18, 0, 0);
         String formatToDate = DateUtil.formatToDateTime(date.getTime());
         assertEquals(formatToDate, "2018-02-28 18:00:00");
 
@@ -212,14 +212,14 @@ public class DateUtilTest {
 
     @Test
     public void formatToDateForDate() {
-        Date date = DateUtil.ofDate(2018, 2, 28, 18, 0, 0);
+        Date date = DateUtil.ofUtilDate(2018, 2, 28, 18, 0, 0);
         String format = DateUtil.formatToDate(date);
         assertEquals(format, "2018-02-28");
     }
 
     @Test
     public void formatToDateTimeForDate() {
-        Date date = DateUtil.ofDate(2018, 2, 28, 18, 0, 0);
+        Date date = DateUtil.ofUtilDate(2018, 2, 28, 18, 0, 0);
         String format = DateUtil.formatToDateTime(date);
         assertEquals(format, "2018-02-28 18:00:00");
     }
@@ -244,18 +244,18 @@ public class DateUtilTest {
     @Test
     public void parseToDate() {
         final String strDate = "2019-01-01";
-        Date parseFromDate = DateUtil.parseToDate(strDate);
+        Date parseFromDate = DateUtil.parseToUtilDate(strDate);
 
-        Date date = DateUtil.ofDate(2019, 1, 1);
+        Date date = DateUtil.ofUtilDate(2019, 1, 1);
         assertEquals(parseFromDate, date);
     }
 
     @Test
-    public void parseToDateTime() {
+    public void ofUtilDate() {
         final String strDate = "2019-01-01 23:59:59";
-        Date parseFromDate = DateUtil.parseToDateTime(strDate);
+        Date parseFromDate = DateUtil.parseToUtilDate(strDate);
 
-        Date date = DateUtil.ofDate(2019, 1, 1, 23, 59, 59);
+        Date date = DateUtil.ofUtilDate(2019, 1, 1, 23, 59, 59);
         assertEquals(parseFromDate, date);
     }
 
@@ -267,11 +267,11 @@ public class DateUtilTest {
     }
 
     @Test
-    public void parseToJUDate() {
+    public void ofUtilDate2() {
         final String strDate = "2019/04/10 12:00:00";
         final String pattern = "yyyy/MM/dd HH:mm:ss";
-        Date parse = DateUtil.parseToJUDate(strDate, pattern);
-        Date date = DateUtil.ofDate(2019, 4, 10, 12, 0, 0);
+        Date parse = DateUtil.parseToUtilDate(strDate, pattern);
+        Date date = DateUtil.ofUtilDate(2019, 4, 10, 12, 0, 0);
         assertEquals(parse, date);
     }
 
@@ -285,7 +285,7 @@ public class DateUtilTest {
 
     @Test
     public void get() {
-        Date date = DateUtil.ofDate(2020, 1, 30, 14, 10, 0);
+        Date date = DateUtil.ofUtilDate(2020, 1, 30, 14, 10, 0);
         assertEquals(DateUtil.getYear(date), 2020);
         assertEquals(DateUtil.getMonth(date), 1);
         assertEquals(DateUtil.getDay(date), 30);
