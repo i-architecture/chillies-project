@@ -243,10 +243,10 @@ public class DateUtilTest {
 
     @Test
     public void parseToDate() {
-        final String strDate = "2019-01-01";
+        final String strDate = "2021-01-01 00:00:00";
         Date parseFromDate = DateUtil.parseToUtilDate(strDate);
 
-        Date date = DateUtil.ofUtilDate(2019, 1, 1);
+        Date date = DateUtil.ofUtilDate(2021, 1, 1);
         assertEquals(parseFromDate, date);
     }
 
@@ -297,11 +297,21 @@ public class DateUtilTest {
     }
 
     @Test
+    public void betweenDays() {
+        LocalDate start = LocalDate.of(2016, 2, 6);
+        LocalDate end = LocalDate.of(2021, 2, 24);
+        assertEquals(1845, DateUtil.betweenDays(start, end));
+        Date start1 = new Date(2016, 1, 6);
+        Date end1 = new Date(2021, 1, 24);
+        assertEquals(1845, DateUtil.betweenDays(start1, end1));
+    }
+
+    @Test
     public void test() {
         String text = "2020-04-30T23:59:59+08:00";
-        System.out.println(OffsetDateTime.parse(text,DateTimeFormatter.ISO_ZONED_DATE_TIME).format(DateTimeFormatter.ISO_ZONED_DATE_TIME));
+        System.out.println(OffsetDateTime.parse(text, DateTimeFormatter.ISO_ZONED_DATE_TIME).format(DateTimeFormatter.ISO_ZONED_DATE_TIME));
         System.out.println(ZonedDateTime.of(LocalDateTime.of(2020, 4, 16, 10, 10, 10), ZoneOffsetConstant.BEIJING_ZONE_OFFSET)
-        .format(DateTimeFormatter.ISO_ZONED_DATE_TIME));
+                .format(DateTimeFormatter.ISO_ZONED_DATE_TIME));
     }
 
 }

@@ -3,14 +3,13 @@ package com.ijiagoushi.chillies.core.date;
 import com.ijiagoushi.chillies.core.exceptions.DateRuntimeException;
 import com.ijiagoushi.chillies.core.lang.Preconditions;
 import com.ijiagoushi.chillies.core.lang.StringUtil;
+import org.jetbrains.annotations.NotNull;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
 import java.time.format.DateTimeFormatter;
-import java.time.temporal.ChronoField;
-import java.time.temporal.TemporalAccessor;
-import java.time.temporal.UnsupportedTemporalTypeException;
+import java.time.temporal.*;
 import java.util.Date;
 
 /**
@@ -475,6 +474,28 @@ public class DateUtil {
     }
 
     //endregion
+
+    /**
+     * 计算两个日期之间的相差天数
+     *
+     * @param start 开始时间
+     * @param end   结束时间
+     * @return 相差的天数
+     */
+    public static int betweenDays(@NotNull Temporal start, @NotNull Temporal end) {
+        return (int) ChronoUnit.DAYS.between(start, end);
+    }
+
+    /**
+     * 计算两个日期之间的相差天数
+     *
+     * @param start 开始时间
+     * @param end   结束时间
+     * @return 相差的天数
+     */
+    public static int betweenDays(@NotNull Date start, @NotNull Date end) {
+        return betweenDays(start.toInstant(), end.toInstant());
+    }
 
     /**
      * 判断是否是闰年，闰年规则：<a href="http://zh.wikipedia.org/wiki/%E9%97%B0%E5%B9%B4">闰年查看</a>
