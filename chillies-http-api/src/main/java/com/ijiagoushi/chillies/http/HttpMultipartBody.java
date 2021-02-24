@@ -152,11 +152,12 @@ public class HttpMultipartBody extends HttpRequestBody {
         private List<Part> parts = new ArrayList<>();
 
         public Builder() {
+            this.contentType = ContentType.MULTIPART_FORM_DATA;
         }
 
         public Builder boundary(String boundary) {
-            this.boundary = boundary;
             this.contentType = ContentType.MULTIPART_FORM_DATA;
+            this.boundary = boundary;
             return this;
         }
 
