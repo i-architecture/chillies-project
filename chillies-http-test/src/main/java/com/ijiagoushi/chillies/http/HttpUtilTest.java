@@ -1,5 +1,6 @@
 package com.ijiagoushi.chillies.http;
 
+import com.ijiagoushi.chillies.http.easy.GetHttpUtil;
 import org.junit.jupiter.api.Test;
 
 import java.util.HashMap;
@@ -20,7 +21,7 @@ public class HttpUtilTest {
         queryParams.put("doctype", "json");
         queryParams.put("type", "AUTO");
         queryParams.put("i", "计算");
-        String html = HttpUtil.get("http://fanyi.youdao.com/translate", queryParams);
+        String html = GetHttpUtil.execute("http://fanyi.youdao.com/translate", queryParams);
         System.out.println("html = " + html);
     }
 

@@ -172,9 +172,9 @@ public final class HttpRequest {
             return this;
         }
 
-        public Builder headers(Map<String, ?> headerMap) {
-            if (CollectionUtil.isNotEmpty(headerMap)) {
-                headerMap.forEach((BiConsumer<String, Object>) (name, values) -> {
+        public Builder headers(HttpHeaders headers) {
+            if (CollectionUtil.isNotEmpty(headers)) {
+                headers.forEach((BiConsumer<String, Object>) (name, values) -> {
                     if (StringUtil.isEmpty(name) || values == null) {
                         return;
                     }

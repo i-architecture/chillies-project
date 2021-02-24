@@ -2,6 +2,7 @@ package com.ijiagoushi.chillies.http;
 
 import com.ijiagoushi.chillies.core.lang.Preconditions;
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 import java.util.concurrent.TimeUnit;
 
@@ -140,12 +141,38 @@ public class HttpOptions {
             this.proxyInfo = source.proxyInfo;
         }
 
+        /**
+         * 设置连接超时时间，单位毫秒
+         *
+         * @param connectTimeoutMillis 连接超时毫秒数
+         * @return {@code Builder}
+         */
         public Builder connectTimeoutMillis(int connectTimeoutMillis) {
             Preconditions.checkArgument(connectTimeoutMillis >= 0, "'connectTimeoutMillis' must than 0");
             this.connectTimeoutMillis = connectTimeoutMillis;
             return this;
         }
 
+        /**
+         * 设置连接超时时间，单位毫秒
+         *
+         * @param connectTimeoutMillis 连接超时毫秒数
+         * @return {@code Builder}
+         */
+        public Builder connectTimeoutMillis(@Nullable Integer connectTimeoutMillis) {
+            if (connectTimeoutMillis != null) {
+                return connectTimeoutMillis(connectTimeoutMillis.intValue());
+            }
+            return this;
+        }
+
+        /**
+         * 设置连接超时时间
+         *
+         * @param connectTimeout 连接超时时间
+         * @param timeUnit       超时单位
+         * @return {@code Builder}
+         */
         public Builder connectTimeout(int connectTimeout, @NotNull TimeUnit timeUnit) {
             Preconditions.checkArgument(connectTimeoutMillis >= 0, "'connectTimeout' must than 0");
             Preconditions.requireNonNull(timeUnit, "'timeUnit' must not be null");
@@ -153,12 +180,52 @@ public class HttpOptions {
             return this;
         }
 
+        /**
+         * 设置连接超时时间
+         *
+         * @param connectTimeout 连接超时时间
+         * @param timeUnit       超时单位
+         * @return {@code Builder}
+         */
+        public Builder connectTimeout(@Nullable Integer connectTimeout, @Nullable TimeUnit timeUnit) {
+            if (connectTimeout != null) {
+                return connectTimeout(connectTimeout.intValue(), timeUnit);
+            }
+            return this;
+        }
+
+        /**
+         * 设置读取超时时间
+         *
+         * @param readTimeoutMillis 读取数据超时时间，时间单位为毫秒
+         * @return {@code Builder}
+         */
         public Builder readTimeoutMillis(int readTimeoutMillis) {
             Preconditions.checkArgument(readTimeoutMillis >= 0, "'readTimeoutMillis' must than 0");
             this.readTimeoutMillis = readTimeoutMillis;
             return this;
         }
 
+        /**
+         * 设置读取超时时间
+         *
+         * @param readTimeoutMillis 读取数据超时时间，时间单位为毫秒
+         * @return {@code Builder}
+         */
+        public Builder readTimeoutMillis(Integer readTimeoutMillis) {
+            if (readTimeoutMillis != null) {
+                return readTimeoutMillis(readTimeoutMillis.intValue());
+            }
+            return this;
+        }
+
+        /**
+         * 设置读取超时时间
+         *
+         * @param readTimeout 读取数据超时时间
+         * @param timeUnit    时间单位
+         * @return {@code Builder}
+         */
         public Builder readTimeout(int readTimeout, @NotNull TimeUnit timeUnit) {
             Preconditions.checkArgument(readTimeout >= 0, "'readTimeout' must than 0");
             Preconditions.requireNonNull(timeUnit, "'timeUnit' must not be null");
@@ -166,16 +233,70 @@ public class HttpOptions {
             return this;
         }
 
+        /**
+         * 设置读取超时时间
+         *
+         * @param readTimeout 读取数据超时时间
+         * @param timeUnit    时间单位
+         * @return {@code Builder}
+         */
+        public Builder readTimeout(@Nullable Integer readTimeout, @Nullable TimeUnit timeUnit) {
+            if (readTimeout != null) {
+                return readTimeout(readTimeout.intValue(), timeUnit);
+            }
+            return this;
+        }
+
+        /**
+         * 写出的超时时间
+         *
+         * @param writeTimeoutMillis 超时毫秒数
+         * @return {@code Builder}
+         */
         public Builder writeTimeoutMillis(int writeTimeoutMillis) {
             Preconditions.checkArgument(writeTimeoutMillis >= 0, "'writeTimeoutMillis' must than 0");
             this.writeTimeoutMillis = writeTimeoutMillis;
             return this;
         }
 
+        /**
+         * 写出的超时时间
+         *
+         * @param writeTimeoutMillis 超时毫秒数
+         * @return {@code Builder}
+         */
+        public Builder writeTimeoutMillis(Integer writeTimeoutMillis) {
+            if (writeTimeoutMillis != null) {
+                return writeTimeoutMillis(writeTimeoutMillis.intValue());
+            }
+            return this;
+        }
+
+        /**
+         * 写出的超时时间
+         *
+         * @param writeTimeout 超时毫秒数
+         * @param timeUnit     时间单位
+         * @return {@code Builder}
+         */
         public Builder writeTimeout(int writeTimeout, @NotNull TimeUnit timeUnit) {
             Preconditions.checkArgument(writeTimeout >= 0, "'writeTimeout' must than 0");
             Preconditions.requireNonNull(timeUnit, "'timeUnit' must not be null");
             this.writeTimeoutMillis = (int) timeUnit.toMillis(writeTimeout);
+            return this;
+        }
+
+        /**
+         * 写出的超时时间
+         *
+         * @param writeTimeout 超时
+         * @param timeUnit     时间单位
+         * @return {@code Builder}
+         */
+        public Builder writeTimeout(Integer writeTimeout, @NotNull TimeUnit timeUnit) {
+            if (writeTimeout != null) {
+                return writeTimeout(writeTimeout.intValue(), timeUnit);
+            }
             return this;
         }
 
