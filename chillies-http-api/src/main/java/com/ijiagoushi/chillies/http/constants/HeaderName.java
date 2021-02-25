@@ -132,9 +132,16 @@ public enum HeaderName {
     /**
      * 重定向指示到的URL
      */
-    LOCATION("Location");
+    LOCATION("Location"),
 
-    private String value;
+    /**
+     * 授权
+     */
+    AUTHORIZATION("Authorization"),
+
+    ;
+
+    private final String value;
 
     HeaderName(String value) {
         this.value = value;

@@ -241,13 +241,19 @@ public class BeanUtil {
                 if (!finalCo.isIgnoreNullValue()) {
                     if (!finalCo.getIgnoreProperties().contains(key)) {
                         PropertyDescriptor propertyDescriptor = propertyDescriptorMap.get(key);
-                        ReflectUtil.invoke(propertyDescriptor.getWriteMethod(), target, new Object[]{null});
+                        Method writeMethod = propertyDescriptor.getWriteMethod();
+                        if (writeMethod != null) {
+                            ReflectUtil.invoke(writeMethod, target, new Object[]{null});
+                        }
                     }
                 }
             } else {
                 if (!finalCo.getIgnoreProperties().contains(key)) {
                     PropertyDescriptor propertyDescriptor = propertyDescriptorMap.get(key);
-                    ReflectUtil.invoke(propertyDescriptor.getWriteMethod(), target, value);
+                    Method writeMethod = propertyDescriptor.getWriteMethod();
+                    if (writeMethod != null) {
+                        ReflectUtil.invoke(writeMethod, target, value);
+                    }
                 }
             }
         });
@@ -351,11 +357,15 @@ public class BeanUtil {
                     if (value == null) {
                         if (!finalCo.isIgnoreNullValue()) {
                             PropertyDescriptor targetPd = targetPdMap.get(key);
-                            ReflectUtil.invoke(targetPd.getWriteMethod(), target, new Object[]{null});
+                            if (targetPd != null) {
+                                ReflectUtil.invoke(targetPd.getWriteMethod(), target, new Object[]{null});
+                            }
                         }
                     } else if (!finalCo.getIgnoreProperties().contains(key)) {
                         PropertyDescriptor targetPd = targetPdMap.get(key);
-                        ReflectUtil.invoke(targetPd.getWriteMethod(), target, value);
+                        if (targetPd != null) {
+                            ReflectUtil.invoke(targetPd.getWriteMethod(), target, value);
+                        }
                     }
                 });
 
