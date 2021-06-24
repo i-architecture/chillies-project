@@ -4,6 +4,8 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.ijiagoushi.chillies.json.Handler;
 import com.ijiagoushi.chillies.json.JSONRuntimeException;
+import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 import java.io.IOException;
 import java.io.Reader;
@@ -28,7 +30,7 @@ public class JacksonHandler implements Handler {
      * @throws JSONRuntimeException 序列化出现异常
      */
     @Override
-    public String serialize(Object src, Type typeOfT) throws JSONRuntimeException {
+    public String serialize(@NotNull Object src, @Nullable Type typeOfT) throws JSONRuntimeException {
         try {
             return objectMapper.writeValueAsString(src);
         } catch (JsonProcessingException e) {
