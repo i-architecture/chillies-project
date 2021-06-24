@@ -1,7 +1,14 @@
 package com.ijiagoushi.chillies.core.date;
 
+import com.ijiagoushi.chillies.core.lang.Preconditions;
+import com.ijiagoushi.chillies.core.lang.SimpleCache;
+import org.jetbrains.annotations.NotNull;
+
 import java.time.format.DateTimeFormatter;
 import java.time.format.DateTimeFormatterBuilder;
+import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
+import java.util.regex.Pattern;
 
 public class DatePattern {
 
@@ -122,7 +129,7 @@ public class DatePattern {
      * @see #SMART_NORMAL_DATE_PATTERN
      * @see #SMART_NORMAL_TIME_PATTERN
      */
-    public static final String SMART_NORMAL__PATTERN = "yyyy-M-d[ H][:m][:s][.SSS]";
+    public static final String SMART_NORMAL_PATTERN = "yyyy-M-d[ H][:m][:s][.SSS]";
 
     /**
      * 智能的日期时间（含毫秒）格式
@@ -130,7 +137,7 @@ public class DatePattern {
      * @see #SMART_NORMAL_DATE_FORMATTER
      * @see #SMART_NORMAL_TIME_FORMATTER
      */
-    public static final DateTimeFormatter SMART_NORMAL_FORMATTER = DateTimeFormatter.ofPattern(SMART_NORMAL__PATTERN);
+    public static final DateTimeFormatter SMART_NORMAL_FORMATTER = DateTimeFormatter.ofPattern(SMART_NORMAL_PATTERN);
 
     // endregion
 
@@ -194,32 +201,74 @@ public class DatePattern {
 
     // region ================ UTC And Zone ================
 
+    /**
+     * UTC时间：yyyy-MM-dd'T'HH:mm:ss
+     */
+    public static final String UTC_SIMPLE_PATTERN = "yyyy-MM-dd'T'HH:mm:ss";
+
+    /**
+     * UTC时间：yyyy-MM-dd'T'HH:mm:ss.SSS
+     */
+    public static final String UTC_MS_SIMPLE_PATTERN = "yyyy-MM-dd'T'HH:mm:ss";
 
     /**
      * UTC时间：yyyy-MM-dd'T'HH:mm:ss'Z'
      */
-    public final static String UTC_WITH_ZONE_OFFSET_PATTERN = "yyyy-MM-dd'T'HH:mm:ss";
+    public static final String UTC_PATTERN = "yyyy-MM-dd'T'HH:mm:ss'Z'";
 
     /**
-     * UTC时间：yyyy-MM-dd'T'HH:mm:ss'Z'
+     * UTC时间：yyyy-MM-dd'T'HH:mm:ss.SSS'Z'
+     */
+    public static final String UTC_MS_PATTERN = "yyyy-MM-dd'T'HH:mm:ss.SSS'Z'";
+
+    /**
+     * UTC时间：yyyy-MM-dd'T'HH:mm:ssZ
+     */
+    public final static String UTC_WITH_ZONE_OFFSET_PATTERN = "yyyy-MM-dd'T'HH:mm:ssZ";
+
+    /**
+     * UTC时间：yyyy-MM-dd'T'HH:mm:ssZ
      */
     public final static DateTimeFormatter UTC_WITH_ZONE_OFFSET_FORMATTER;
 
     /**
      * UTC时间：yyyy-MM-dd'T'HH:mm:ss.SSSZ
      */
-    public final static String UTC_MS_WITH_ZONE_OFFSET_PATTERN = "yyyy-MM-dd'T'HH:mm:ss.SSS";
+    public final static String UTC_MS_WITH_ZONE_OFFSET_PATTERN = "yyyy-MM-dd'T'HH:mm:ss.SSSZ";
 
     /**
-     * UTC时间：yyyy-MM-dd'T'HH:mm:ssZ
+     * UTC时间：yyyy-MM-dd'T'HH:mm:ss.SSSZ
      */
     public final static DateTimeFormatter UTC_MS_WITH_ZONE_OFFSET_FORMATTER;
 
-    /**DatePattern.UTC_MS_WITH_ZONE_OFFSET_FORMATTER
+    /**
+     * DatePattern.UTC_MS_WITH_ZONE_OFFSET_FORMATTER
      * RFC3339标准格式：yyyy-MM-dd'T'HH:mm:ss.SSS+TIMEZONE
      * 如：2020-04-12 17:00:00.120+09:00
      */
     public static final DateTimeFormatter RFC_3339_FORMATTER;
+
+    // endregion
+
+    // region ================ Others ================
+
+    /**
+     * JDK中日期时间格式：EEE MMM dd HH:mm:ss zzz yyyy
+     */
+    public static final String JDK_DATETIME_PATTERN = "EEE MMM dd HH:mm:ss zzz yyyy";
+
+    /**
+     * 标准日期时间正则，每个字段支持单个数字或2个数字，包括：
+     * <pre>
+     *     yyyy-MM-dd HH:mm:ss.SSS
+     *     yyyy-MM-dd HH:mm:ss
+     *     yyyy-MM-dd HH:mm
+     *     yyyy-MM-dd
+     * </pre>
+     *
+     * @since 5.3.6
+     */
+    public static final Pattern REGEX_NORM = Pattern.compile("\\d{4}-\\d{1,2}-\\d{1,2}(\\s\\d{1,2}:\\d{1,2}(:\\d{1,2})?)?(.\\d{1,3})?");
 
     // endregion
 
@@ -234,6 +283,51 @@ public class DatePattern {
                 .appendOffsetId();
         UTC_MS_WITH_ZONE_OFFSET_FORMATTER = builder.toFormatter();
         RFC_3339_FORMATTER = UTC_MS_WITH_ZONE_OFFSET_FORMATTER;
+    }
+
+    private static Map<String, DateTimeFormatter> builtin;
+    private static SimpleCache<String, DateTimeFormatter> custom;
+
+    static {
+        builtin = new ConcurrentHashMap<>();
+        custom = new SimpleCache<>(16, 128);
+
+        // normal
+        builtin.put(NORMAL_DATE_PATTERN, NORMAL_DATE_FORMATTER);
+        builtin.put(SMART_NORMAL_DATE_PATTERN, SMART_NORMAL_DATE_FORMATTER);
+        builtin.put(NORMAL_TIME_PATTERN, NORMAL_TIME_FORMATTER);
+        builtin.put(NORMAL_DATETIME_MINUTE_PATTERN, NORMAL_DATETIME_MINUTE_FORMATTER);
+        builtin.put(NORMAL_DATETIME_PATTERN, NORMAL_DATETIME_FORMATTER);
+        builtin.put(SMART_NORMAL_DATETIME_PATTERN, SMART_NORMAL_DATETIME_FORMATTER);
+        builtin.put(NORMAL_DATETIME_MS_PATTERN, NORMAL_DATETIME_MS_FORMATTER);
+        // pure
+        builtin.put(PURE_DATE_PATTERN, PURE_DATE_FORMATTER);
+        builtin.put(PURE_TIME_PATTERN, PURE_TIME_FORMATTER);
+        builtin.put(PURE_DATETIME_PATTERN, PURE_DATETIME_FORMATTER);
+        builtin.put(PURE_DATETIME_MS_PATTERN, PURE_DATETIME_MS_FORMATTER);
+        // chinese
+        builtin.put(CHINESE_DATE_PATTERN, CHINESE_DATE_FORMATTER);
+        // utc
+        builtin.put(UTC_WITH_ZONE_OFFSET_PATTERN, UTC_WITH_ZONE_OFFSET_FORMATTER);
+        builtin.put(UTC_MS_WITH_ZONE_OFFSET_PATTERN, UTC_MS_WITH_ZONE_OFFSET_FORMATTER);
+    }
+
+    /**
+     * 获取格式化器
+     *
+     * @param pattern 日期格式
+     * @return {@linkplain DateTimeFormatter}格式化器
+     */
+    public static DateTimeFormatter ofPattern(@NotNull String pattern) {
+        Preconditions.requireNotEmpty(pattern, "pattern must not be null or empty");
+        DateTimeFormatter result = builtin.get(pattern);
+        if (result == null) {
+            result = custom.get(pattern);
+        }
+        if (result == null) {
+            result = custom.computeIfAbsent(pattern, DateTimeFormatter::ofPattern);
+        }
+        return result;
     }
 
 }

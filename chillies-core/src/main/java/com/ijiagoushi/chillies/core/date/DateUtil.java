@@ -1,16 +1,18 @@
 package com.ijiagoushi.chillies.core.date;
 
 import com.ijiagoushi.chillies.core.exceptions.DateRuntimeException;
-import com.ijiagoushi.chillies.core.lang.Preconditions;
-import com.ijiagoushi.chillies.core.lang.StringUtil;
+import com.ijiagoushi.chillies.core.lang.*;
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
+import java.text.ParseException;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
-import java.time.format.DateTimeFormatter;
-import java.time.temporal.*;
 import java.util.Date;
+import java.util.List;
+import java.util.Locale;
+import java.util.TimeZone;
 
 /**
  * Date Utilities
@@ -23,160 +25,126 @@ public class DateUtil {
         throw new AssertionError("Cannot create instance!");
     }
 
+    /**
+     * java.util.Date EEE MMM zzz 缩写数组
+     */
+    public static final String[] WTB = {
+            "sun", "mon", "tue", "wed", "thu", "fri", "sat", // 星期
+            "jan", "feb", "mar", "apr", "may", "jun", "jul", "aug", "sep", "oct", "nov", "dec", // 月份
+            "gmt", "ut", "utc", "est", "edt", "cst", "cdt", "mst", "mdt", "pst", "pdt" //时区
+    };
+
+    /**
+     * 规范化日期，以空格区分日期和时间，空格前为日期，空格后未时间<br>
+     * 将以下字符串会替换为"-"
+     * <pre>
+     *     "."
+     *     "/"
+     *     "年"
+     *     "月"
+     * </pre>
+     * <p>
+     * 删除"日"字符
+     * <p>
+     * 将以下字符替换为":"
+     * <pre>
+     * "时"
+     * "分"
+     * "秒"
+     * </pre>
+     * 当末位是":"时去除之（不存在毫秒时）
+     *
+     * @param dateStr 日期时间字符串
+     * @return 格式化后的日期字符串
+     */
+    public static String normalize(CharSequence dateStr) {
+        if (StringUtil.isBlank(dateStr)) {
+            return StringUtil.str(dateStr);
+        }
+        String str = StringUtil.trim(dateStr);
+        int index = str.indexOf('日');
+        if (index > 0) {
+            if (str.charAt(index + 1) == CharUtil.SPACE) {
+                str = StringUtil.delete(str, index, index + 1);
+            } else {
+                str = StringUtil.replace(str, index, index + 1, CharUtil.SPACE);
+            }
+        }
+        List<String> resultList = StringUtil.splitToList(str, CharUtil.SPACE, true, true);
+        if (resultList.size() > 2) {
+            // 无法规范化的日期格式，按照空格分开日期和时间
+            return dateStr.toString();
+        }
+
+        // 日期部分（"\"、"/"、"."、"年"、"月"都替换为"-"）
+        String datePart = StringUtil.replace(resultList.get(0), new char[]{'.', '/', '年', '月'}, StringUtil.DASH);
+
+        if (resultList.size() == 2) {
+            String timePart = StringUtil.replace(resultList.get(1), new char[]{'时', '分', '秒'}, ":");
+            timePart = StringUtil.deleteSuffix(timePart, ":");
+            return datePart + " " + timePart;
+        }
+        return datePart;
+    }
+
     //region format date method
-
-    /**
-     * 格式化日期
-     *
-     * @param formatter 格式化规则
-     * @return 格式化后的日期字符串
-     */
-    public static String format(DateTimeFormatter formatter) {
-        if (formatter == null) {
-            return null;
-        }
-        return LocalDateTime.now().format(formatter);
-    }
-
-    /**
-     * 格式化日期
-     *
-     * @param localDateTime 日期
-     * @param formatter     格式化规则
-     * @return 格式化后的日期字符串
-     */
-    public static String format(LocalDateTime localDateTime, DateTimeFormatter formatter) {
-        if (localDateTime == null || formatter == null) {
-            return null;
-        }
-        return localDateTime.format(formatter);
-    }
-
-    /**
-     * 格式化日期
-     *
-     * @param localDate 日期
-     * @param formatter 格式化规则
-     * @return 格式化后的日期字符串
-     */
-    public static String format(LocalDate localDate, DateTimeFormatter formatter) {
-        if (localDate == null || formatter == null) {
-            return null;
-        }
-        return localDate.format(formatter);
-    }
-
-    /**
-     * 格式化时间
-     *
-     * @param localTime 时间
-     * @param formatter 格式化规则
-     * @return 格式化后的日期字符串
-     */
-    public static String format(LocalTime localTime, DateTimeFormatter formatter) {
-        if (localTime == null || formatter == null) {
-            return null;
-        }
-        return formatter.format(localTime);
-    }
-
-    /**
-     * 格式化当前日期，格式化规则为：yyyy-MM-dd
-     *
-     * @return 格式化后的日期字符串
-     */
-    public static String formatToDate() {
-        return format(LocalDate.now(), DatePattern.NORMAL_DATE_FORMATTER);
-    }
 
     /**
      * 格式化当前时间，格式化规则为: yyyy-MM-dd HH:mm:ss
      *
      * @return 格式化后的日期字符串
+     * @see LocalDateTimeUtil#format()
      */
-    public static String formatToDateTime() {
-        return format(LocalDateTime.now(), DatePattern.NORMAL_DATETIME_FORMATTER);
-    }
-
-    /**
-     * 格式化当前时间，格式化规则为: HH:mm:ss
-     *
-     * @return 格式化后的时间字符串
-     */
-    public static String formatToTime() {
-        return format(LocalTime.now(), DatePattern.NORMAL_TIME_FORMATTER);
-    }
-
-    /**
-     * 格式化指定{@code date}，格式化规则为: yyyy-MM-dd
-     *
-     * @param epochMilliSeconds 日期毫秒数
-     * @return 日期字符串
-     */
-    public static String formatToDate(final long epochMilliSeconds) {
-        return format(DateConverter.to(epochMilliSeconds), DatePattern.NORMAL_DATE_FORMATTER);
-    }
-
-    /**
-     * 格式化指定{@code date}，格式化规则为: yyyy-MM-dd HH:mm:ss
-     *
-     * @param epochMilliSeconds 日期毫秒数
-     * @return 日期字符串
-     */
-    public static String formatToDateTime(final long epochMilliSeconds) {
-        return format(DateConverter.to(epochMilliSeconds), DatePattern.NORMAL_DATETIME_FORMATTER);
-    }
-
-    /**
-     * 格式化指定{@code date}，格式化规则为: yyyy-MM-dd
-     *
-     * @param date 日期对象
-     * @return 日期字符串
-     */
-    public static String formatToDate(final Date date) {
-        return format(DateConverter.toLocalDate(date));
-    }
-
-    /**
-     * 格式化指定{@code date}，格式化规则为: yyyy-MM-dd HH:mm:ss
-     *
-     * @param date 日期对象
-     * @return 日期字符串
-     */
-    public static String formatToDateTime(final Date date) {
-        return format(DateConverter.to(date));
+    public static String format() {
+        return format((String) null);
     }
 
     /**
      * 格式化当前时间，格式化规则为{@code pattern}
      *
-     * @param pattern 格式化规则
+     * @param pattern 格式化规则，为空时默认采用格式：yyyy-MM-dd HH:mm:ss
      * @return 日期字符串
      */
-    public static String format(String pattern) {
-        if (StringUtil.isEmpty(pattern)) {
-            return null;
-        }
-        return CustomFormatterCache.format(LocalDateTime.now(), pattern);
+    public static String format(@Nullable String pattern) {
+        return LocalDateTimeUtil.format(pattern);
     }
 
     /**
-     * 格式化指定{@code date}，格式化规则为{@code pattern}
+     * 将时间戳格式化，格式化规则为: yyyy-MM-dd HH:mm:ss
      *
-     * @param epochMilliSeconds 毫秒数
-     * @param pattern           格式化规则
+     * @param epochMilli 日期毫秒数
      * @return 日期字符串
      */
-    public static String format(final long epochMilliSeconds, final String pattern) {
-        return CustomFormatterCache.format(DateConverter.to(epochMilliSeconds), pattern);
+    public static String format(final long epochMilli) {
+        return format(epochMilli, DatePattern.NORMAL_DATETIME_PATTERN);
     }
 
-    public static String format(final long epochMilliSeconds, DateTimeFormatter formatter) {
-        if (formatter == null) {
-            return null;
+    /**
+     * 将时间戳格式化，格式化规则为{@code pattern}
+     *
+     * @param epochMilli 毫秒数
+     * @param pattern    格式化规则
+     * @return 日期字符串
+     */
+    public static String format(final long epochMilli, final String pattern) {
+        Preconditions.checkArgument(epochMilli >= 0, "epochMilli");
+        String strPattern;
+        if (StringUtil.isBlank(pattern)) {
+            strPattern = DatePattern.NORMAL_DATETIME_PATTERN;
+        } else {
+            strPattern = pattern;
         }
-        LocalDateTime localDateTime = DateConverter.to(epochMilliSeconds);
-        return localDateTime.format(formatter);
+        return ThreadSafeDateParse.format(epochMilli, strPattern);
+    }
+
+    /**
+     * 格式化指定{@code date}，格式化规则为: yyyy-MM-dd HH:mm:ss
+     *
+     * @param date 日期对象
+     * @return 日期字符串
+     */
+    public static String format(@Nullable Date date) {
+        return format(date, DatePattern.NORMAL_DATETIME_PATTERN);
     }
 
     /**
@@ -186,11 +154,17 @@ public class DateUtil {
      * @param pattern 格式化规则
      * @return 日期字符串
      */
-    public static String format(Date date, String pattern) {
-        if (date == null || StringUtil.isEmpty(pattern)) {
+    public static String format(@Nullable final Date date, @Nullable final String pattern) {
+        if (date == null) {
             return null;
         }
-        return CustomFormatterCache.format(DateConverter.to(date), pattern);
+        String strPattern;
+        if (StringUtil.isBlank(pattern)) {
+            strPattern = DatePattern.NORMAL_DATETIME_PATTERN;
+        } else {
+            strPattern = pattern;
+        }
+        return ThreadSafeDateParse.format(date, strPattern);
     }
 
     /**
@@ -202,214 +176,225 @@ public class DateUtil {
      * @param destPattern 转换的日期格式化规则
      * @return 转换后的日期字符串
      */
-    public static String swapFormat(String text, String srcPattern, String destPattern) {
-        if (StringUtil.isEmpty(text) || StringUtil.isEmpty(srcPattern) || StringUtil.isEmpty(destPattern)) {
+    public static String swapFormat(CharSequence text, String srcPattern, String destPattern) {
+        if (StringUtil.isAnyEmpty(text, srcPattern, destPattern)) {
             return null;
         }
         if (srcPattern.length() > text.length()) {
             throw new DateRuntimeException("SrcPattern '" + srcPattern + "' is long than text '" + text);
         }
-        String newText = text;
+        String newText = text.toString();
         if (srcPattern.length() < text.length()) {
             // 尝试截取，但不保证截取正确
-            newText = text.substring(0, srcPattern.length());
+            newText = newText.substring(0, srcPattern.length());
         }
-        return CustomFormatterCache.swapFormat(newText, srcPattern, destPattern);
+        try {
+            Date theDate = ThreadSafeDateParse.parse(newText, srcPattern);
+            return ThreadSafeDateParse.format(theDate, destPattern);
+        } catch (ParseException e) {
+            throw new DateRuntimeException(e);
+        }
     }
 
     //endregion
 
-    //region format localDate
-
-    /**
-     * 格式化日期,格式化规则为: yyyy-MM-dd
-     *
-     * @param localDate 日期
-     * @return 格式化后的日期字符串
-     */
-    public static String format(LocalDate localDate) {
-        if (localDate == null) {
-            return null;
-        }
-        return format(localDate, DatePattern.NORMAL_DATE_FORMATTER);
-    }
-
-    /**
-     * 格式化日期
-     *
-     * @param localDate 日期
-     * @param pattern   格式化规则
-     * @return 格式化后的日期字符串
-     */
-    public static String format(LocalDate localDate, String pattern) {
-        if (localDate == null || StringUtil.isEmpty(pattern)) {
-            return null;
-        }
-        return CustomFormatterCache.format(localDate, pattern);
-    }
-
-    /**
-     * 格式化日期,格式化规则为: yyyy-MM-dd HH:mm:ss
-     *
-     * @param localDateTime 日期
-     * @return 格式化后的日期字符串
-     */
-    public static String format(LocalDateTime localDateTime) {
-        return format(localDateTime, DatePattern.NORMAL_DATETIME_FORMATTER);
-    }
-
-    /**
-     * 格式化日期
-     *
-     * @param localDateTime 日期
-     * @param pattern       格式化规则
-     * @return 格式化后的日期字符串
-     */
-    public static String format(LocalDateTime localDateTime, String pattern) {
-        if (localDateTime == null || StringUtil.isEmpty(pattern)) {
-            return null;
-        }
-        return CustomFormatterCache.format(localDateTime, pattern);
-    }
-
-    //endregion
 
     //region parse method
 
     /**
-     * 解析日期字符串,解析规则: yyyy-MM-dd HH:mm:ss
+     * 会尽量解析日期字符串，适用于不太确定输入的日期格式，支持如下格式：<br>
+     * <ol>
+     *     <li>yyyy-MM-dd HH:mm:ss.SSS</li>
+     *     <li>yyyy-MM-dd HH:mm:ss</li>
+     *     <li>yyyy-MM-dd HH:mm</li>
+     *     <li>yyyy/MM/dd HH:mm:ss</li>
+     *     <li>yyyy.MM.dd HH:mm:ss</li>
+     *     <li>yyyy年MM月dd日 HH时mm分ss秒</li>
+     *     <li>yyyy-MM-dd</li>
+     *     <li>yyyy/MM/dd</li>
+     *     <li>yyyy.MM.dd</li>
+     *     <li>yyyyMMddHHmmss</li>
+     *     <li>yyyyMMddHHmmssSSS</li>
+     *     <li>yyyyMMdd</li>
+     *     <li>yyyy-MM-dd'T'HH:mm:ss'Z'</li>
+     *     <li>yyyy-MM-dd'T'HH:mm:ss.SSS'Z'</li>
+     *     <li>yyyy-MM-dd'T'HH:mm:ssZ</li>
+     *     <li>yyyy-MM-dd'T'HH:mm:ss.SSSZ</li>
+     * </ol>
      *
-     * @param strDate 日期字符串
-     * @return 解析后的日期
+     * @param dateCse 日期字符串
+     * @return 日期
      */
-    public static Date parseToUtilDate(String strDate) {
-        return DateConverter.from(parseToLocalDateTime(strDate));
+    @Nullable
+    public static Date tryParse(@Nullable CharSequence dateCse) {
+        if (StringUtil.isBlank(dateCse)) {
+            return null;
+        }
+        String dateStr = StringUtil.trim(dateCse);
+        int len = dateStr.length();
+
+        if (NumberUtil.isDigits(dateStr)) {
+            if (len == DatePattern.PURE_DATETIME_MS_PATTERN.length()) {
+                return parse(dateStr, DatePattern.PURE_DATETIME_MS_PATTERN);
+            } else if (len == DatePattern.PURE_DATETIME_PATTERN.length()) {
+                return parse(dateStr, DatePattern.PURE_DATETIME_PATTERN);
+            } else if (len == DatePattern.PURE_DATE_PATTERN.length()) {
+                return parse(dateStr, DatePattern.PURE_DATE_PATTERN);
+            } else if (len == DatePattern.PURE_TIME_PATTERN.length()) {
+                return parse(dateStr, DatePattern.PURE_TIME_PATTERN);
+            }
+        } else if (RegexUtil.isMatch(Patterns.TIME, dateStr)) {
+            // HH:mm:ss 或者 HH:mm 时间格式匹配单独解析
+            return parseTimeAsToday(dateStr);
+        } else if (StringUtil.containsIgnoreCase(dateStr, WTB)) {
+            // JDK的Date对象toString默认格式，类似于：
+            // Tue Jun 4 16:25:15 +0800 2021
+            // Thu May 16 17:57:18 GMT+08:00 2021
+            // Wed Aug 01 00:00:00 CST 2021
+            return parseCST(dateStr);
+        } else if (StringUtil.contains(dateStr, 'T')) {
+            // UTC时间
+            return parseUTC(dateStr);
+        }
+
+        //规范化日期格式（包括单个数字的日期时间）
+        dateStr = normalize(dateStr);
+        if (RegexUtil.isMatch(DatePattern.REGEX_NORM, dateStr)) {
+            int colonCount = StringUtil.count(dateStr, CharUtil.COLON);
+            if (colonCount == 0) {
+                // yyyy-MM-dd
+                return parse(dateStr, DatePattern.NORMAL_DATE_PATTERN);
+            } else if (colonCount == 1) {
+                // yyyy-MM-dd HH:mm
+                return parse(dateStr, DatePattern.NORMAL_DATETIME_MINUTE_PATTERN);
+            } else if (colonCount == 2) {
+                if (StringUtil.contains(dateStr, CharUtil.DOT)) {
+                    // yyyy-MM-dd HH:mm:ss.SSS
+                    return parse(dateStr, DatePattern.NORMAL_DATETIME_MS_PATTERN);
+                } else {
+                    // yyyy-MM-dd HH:mm:ss
+                    return parse(dateStr, DatePattern.NORMAL_DATETIME_PATTERN);
+                }
+            }
+        }
+
+        return null;
     }
 
     /**
-     * 解析日期字符串,按照指定解析规则转为{@linkplain Date}
-     * <p>{@code java.util.Date}已经是不推荐使用的日期类了，建议新的模块优先采用{@code java.time.*}下的日期类</p>
+     * 解析日期时间字符串
      *
-     * @param strDate 日期字符串
-     * @param pattern 解析规则
-     * @return 日期对象
+     * @param dateCse 日期时间字符串
+     * @param pattern 格式
+     * @return {@linkplain Date}
      */
-    public static Date parseToUtilDate(final String strDate, final String pattern) {
-        if (StringUtil.isAnyEmpty(strDate, pattern)) {
+    public static Date parse(@Nullable CharSequence dateCse, @Nullable String pattern) {
+        if (ObjectUtil.isAnyEmpty(dateCse, pattern)) {
             return null;
         }
-        if (pattern.length() > strDate.length()) {
-            throw new DateRuntimeException("Pattern '" + pattern + "' is long than text '" + strDate + "'");
-        }
-        DateTimeFormatter formatter = CustomFormatterCache.getOrCreateFormatter(pattern);
-        TemporalAccessor temporalAccessor = formatter.parse(strDate);
-
-        LocalDate localDate;
+        String dateStr = StringUtil.trim(dateCse);
         try {
-            int year = temporalAccessor.get(ChronoField.YEAR);
-            int month = temporalAccessor.get(ChronoField.MONTH_OF_YEAR);
-            int day = temporalAccessor.get(ChronoField.DAY_OF_MONTH);
-            localDate = LocalDate.of(year, month, day);
-        } catch (UnsupportedTemporalTypeException e) {
+            return ThreadSafeDateParse.parse(dateStr, pattern, Locale.US);
+        } catch (ParseException e) {
             throw new DateRuntimeException(e);
         }
-
-        int hour = -1, minute = 0, second = 0, nanoSecond = 0;
-        LocalTime localTime = null;
-        try {
-            hour = temporalAccessor.get(ChronoField.HOUR_OF_DAY);
-            minute = temporalAccessor.get(ChronoField.MINUTE_OF_HOUR);
-            second = temporalAccessor.get(ChronoField.SECOND_OF_MINUTE);
-            nanoSecond = temporalAccessor.get(ChronoField.NANO_OF_SECOND);
-        } catch (UnsupportedTemporalTypeException e) {
-            throw new DateRuntimeException(e);
-        }
-        if (hour >= 0) {
-            localTime = LocalTime.of(hour, minute, second, nanoSecond);
-        }
-
-        if (localTime == null) {
-            return DateConverter.from(localDate);
-        } else {
-            return DateConverter.from(LocalDateTime.of(localDate, localTime));
-        }
-    }
-
-    /**
-     * 解析日期字符串,解析规则: yyyy-MM-dd
-     *
-     * @param strDate 日期字符串
-     * @return 解析后的日期
-     */
-    public static LocalDate parseToLocalDate(String strDate) {
-        return parseToLocalDate(strDate, DatePattern.SMART_NORMAL_DATE_FORMATTER);
-    }
-
-    /**
-     * 解析日期字符串
-     *
-     * @param strDate 日期字符串
-     * @param pattern 自定义日期格式
-     * @return 解析后的日期
-     */
-    public static LocalDate parseToLocalDate(String strDate, String pattern) {
-        if (StringUtil.isAnyEmpty(strDate, pattern)) {
-            return null;
-        }
-        DateTimeFormatter formatter = CustomFormatterCache.getOrCreateFormatter(pattern);
-        return parseToLocalDate(strDate, formatter);
-    }
-
-    /**
-     * 解析日期字符串,解析规则: yyyy-MM-dd
-     *
-     * @param strDate 日期字符串
-     * @return 解析后的日期
-     */
-    public static LocalDate parseToLocalDate(String strDate, DateTimeFormatter formatter) {
-        if (StringUtil.isEmpty(strDate) || formatter == null) {
-            return null;
-        }
-        return LocalDate.parse(strDate, formatter);
     }
 
     /**
      * 解析日期字符串,解析规则: yyyy-MM-dd HH:mm:ss
      *
-     * @param strDate 日期字符串
+     * @param dateCse 日期字符串
      * @return 解析后的日期
      */
-    public static LocalDateTime parseToLocalDateTime(String strDate) {
-        return parseToLocalDateTime(strDate, DatePattern.SMART_NORMAL_DATETIME_FORMATTER);
+    public static Date parse(@Nullable CharSequence dateCse) {
+        return parse(dateCse, DatePattern.NORMAL_DATETIME_PATTERN);
     }
 
     /**
-     * 解析日期字符串
+     * 解析时间，格式HH:mm 或 HH:mm:ss，日期默认为今天
      *
-     * @param strDate 日期字符串
-     * @param pattern 自定义日期格式
-     * @return 解析后的日期
+     * @param cse 标准的时间字符串
+     * @return {@linkplain Date}
      */
-    public static LocalDateTime parseToLocalDateTime(String strDate, String pattern) {
-        if (StringUtil.isAnyEmpty(strDate, pattern)) {
+    public static Date parseTimeAsToday(@Nullable CharSequence cse) {
+        if (StringUtil.isBlank(cse)) {
             return null;
         }
-        DateTimeFormatter formatter = CustomFormatterCache.getOrCreateFormatter(pattern);
-        return parseToLocalDateTime(strDate, formatter);
+        LocalDate localDate = LocalDate.now();
+        LocalTime localTime = LocalTime.parse(cse, DatePattern.SMART_NORMAL_TIME_FORMATTER);
+//        if (StringUtil.count(cse, ':') == 1) {
+//            localTime = LocalTime.parse(cse, DatePattern.ofPattern("HH:mm"));
+//        } else {
+//            localTime = LocalTime.parse(cse, DatePattern.NORMAL_TIME_FORMATTER);
+//        }
+        return LocalDateTimeUtil.toDate(LocalDateTime.of(localDate, localTime));
     }
 
     /**
-     * 解析日期字符串
+     * 解析CST时间，格式：
+     * <ol>
+     * <li>EEE MMM dd HH:mm:ss z yyyy（例如：Wed Aug 01 00:00:00 CST 2012）</li>
+     * </ol>
      *
-     * @param strDate   日期字符串
-     * @param formatter 自定义日期格式
-     * @return 解析后的日期
+     * @param cse CST时间
+     * @return {@linkplain Date}
      */
-    public static LocalDateTime parseToLocalDateTime(String strDate, DateTimeFormatter formatter) {
-        if (StringUtil.isEmpty(strDate) || formatter == null) {
+    public static Date parseCST(@Nullable CharSequence cse) {
+        return parse(cse, DatePattern.JDK_DATETIME_PATTERN);
+    }
+
+    /**
+     * 解析UTC时间，格式：
+     * <ol>
+     * <li>yyyy-MM-dd'T'HH:mm:ss'Z'</li>
+     * <li>yyyy-MM-dd'T'HH:mm:ss.SSS'Z'</li>
+     * <li>yyyy-MM-dd'T'HH:mm:ssZ</li>
+     * <li>yyyy-MM-dd'T'HH:mm:ss.SSSZ</li>
+     * </ol>
+     *
+     * @param cse UTC时间
+     * @return {@linkplain Date}
+     */
+    public static Date parseUTC(@Nullable CharSequence cse) {
+        if (StringUtil.isBlank(cse)) {
             return null;
         }
-        return LocalDateTime.parse(strDate, formatter);
+        final int length = cse.length();
+        final String utcStr = StringUtil.str(cse);
+        if (StringUtil.contains(utcStr, 'Z')) {
+            if (length == DatePattern.UTC_PATTERN.length() - 4) {
+                // 格式类似：2018-09-13T05:34:31Z，-4表示减去4个单引号的长度
+                return parse(utcStr, DatePattern.UTC_PATTERN);
+            }
+
+            final int patternLen = DatePattern.UTC_MS_PATTERN.length();
+            // 格式类似：2018-09-13T05:34:31.999Z，-4表示减去4个单引号的长度
+            // -4 ~ -6范围表示匹配毫秒1~3位的情况
+            if (length >= patternLen - 6 && length <= patternLen - 4) {
+                return parse(utcStr, DatePattern.UTC_MS_PATTERN);
+            }
+        } else if (StringUtil.contains(utcStr, '+')) {
+            if (length == DatePattern.UTC_WITH_ZONE_OFFSET_PATTERN.length() + 2 ||
+                    length == DatePattern.UTC_WITH_ZONE_OFFSET_PATTERN.length() + 3) {
+                // 格式类似：2018-09-13T05:34:31+0800 或 2018-09-13T05:34:31+08:00
+                try {
+                    return ThreadSafeDateParse.parse(utcStr, DatePattern.UTC_WITH_ZONE_OFFSET_PATTERN, TimeZone.getTimeZone("UTC"));
+                } catch (ParseException e) {
+                    throw new DateRuntimeException(e);
+                }
+            } else if (length == DatePattern.UTC_MS_WITH_ZONE_OFFSET_PATTERN.length() + 2 ||
+                    length == DatePattern.UTC_MS_WITH_ZONE_OFFSET_PATTERN.length() + 3) {
+                // 格式类似：2018-09-13T05:34:31.999+0800 或 2018-09-13T05:34:31.999+08:00
+                return parse(utcStr, DatePattern.UTC_MS_WITH_ZONE_OFFSET_PATTERN);
+            }
+        } else if (length == DatePattern.UTC_SIMPLE_PATTERN.length() - 2) {
+            // 格式类似：2018-09-13T05:34:31
+            return parse(utcStr, DatePattern.UTC_SIMPLE_PATTERN);
+        } else if (StringUtil.contains(utcStr, CharUtil.DOT)) {
+            // 可能为：  2021-03-17T06:31:33.99
+            return parse(utcStr, DatePattern.UTC_MS_SIMPLE_PATTERN);
+        }
+        throw new DateRuntimeException("No formatter for date string:" + utcStr);
     }
 
     // endregion
@@ -469,8 +454,7 @@ public class DateUtil {
      */
     public static Date ofUtilDate(final int year, final int month, final int dayOfMonth,
                                   final int hour, final int minute, final int second) {
-        LocalDateTime localDateTime = LocalDateTime.of(year, month, dayOfMonth, hour, minute, second);
-        return DateConverter.from(localDateTime);
+        return LocalDateTimeUtil.toDate(LocalDateTime.of(year, month, dayOfMonth, hour, minute, second));
     }
 
     //endregion
@@ -482,25 +466,21 @@ public class DateUtil {
      * @param end   结束时间
      * @return 相差的天数
      */
-    public static int betweenDays(@NotNull Temporal start, @NotNull Temporal end) {
-        return (int) ChronoUnit.DAYS.between(start, end);
-    }
-
-    /**
-     * 计算两个日期之间的相差天数
-     *
-     * @param start 开始时间
-     * @param end   结束时间
-     * @return 相差的天数
-     */
     public static int betweenDays(@NotNull Date start, @NotNull Date end) {
-        return betweenDays(start.toInstant(), end.toInstant());
+        Preconditions.requireNonNull(start, "start");
+        Preconditions.requireNonNull(end, "end");
+        if (start.after(end)) {
+            Date temp = start;
+            start = end;
+            end = temp;
+        }
+        return LocalDateTimeUtil.betweenDays(start.toInstant(), end.toInstant());
     }
 
     /**
      * 判断是否是闰年，闰年规则：<a href="http://zh.wikipedia.org/wiki/%E9%97%B0%E5%B9%B4">闰年查看</a>
      * <pre>
-     *     比如时间2014-05-12 22:10:00  DateCalcUtils.isLeapYear(date); false
+     *     比如时间2014-05-12 22:10:00  DateUtil.isLeapYear(date); false
      * </pre>
      *
      * @param date 日期对象
@@ -520,103 +500,112 @@ public class DateUtil {
     /**
      * 从日期中获取年份
      * <pre>
-     *     比如时间2014-05-12 12:10:00  DateCalcUtils.getYear(date); 2014
+     *     比如时间2014-05-12 12:10:00  DateUtil.getYear(date); 2014
      * </pre>
      *
      * @param date 日期对象
      * @return 年份
      */
-    public static int getYear(Date date) {
-        LocalDateTime localDateTime = DateConverter.to(Preconditions.requireNonNull(date, "date == null"));
-        return localDateTime.getYear();
+    public static int getYear(@NotNull Date date) {
+        Preconditions.requireNonNull(date, "date");
+        return LocalDateTimeUtil.of(date).getYear();
     }
 
     /**
      * 从日期中获取月份
      * <pre>
-     *     比如时间2014-05-12 12:10:00  DateCalcUtils.getMonth(date); 5
+     *     比如时间2014-05-12 12:10:00  DateUtil.getMonth(date); 5
      * </pre>
      *
      * @param date 日期对象
      * @return 月份
      */
-    public static int getMonth(Date date) {
-        LocalDateTime localDateTime = DateConverter.to(Preconditions.requireNonNull(date, "date == null"));
-        return localDateTime.getMonthValue();
+    public static int getMonth(@NotNull Date date) {
+        Preconditions.requireNonNull(date, "date");
+        return LocalDateTimeUtil.of(date).getMonthValue();
     }
 
     /**
      * 从日期中获取天
      * <pre>
-     *     比如时间2014-05-12 12:10:00  DateCalcUtils.getDay(date); 12
+     *     比如时间2014-05-12 12:10:00  DateUtil.getDay(date); 12
      * </pre>
      *
      * @param date 日期对象
      * @return 天
      */
-    public static int getDay(Date date) {
-        LocalDateTime localDateTime = DateConverter.to(Preconditions.requireNonNull(date, "date == null"));
-        return localDateTime.getDayOfMonth();
+    public static int getDay(@NotNull Date date) {
+        Preconditions.requireNonNull(date, "date");
+        return LocalDateTimeUtil.of(date).getDayOfMonth();
     }
 
     /**
      * 从日期中获取小时（24制）
      * <pre>
-     *     比如时间2014-05-12 22:10:00  DateCalcUtils.get24Hour(date); 22
+     *     比如时间2014-05-12 22:10:00  DateUtil.get24Hour(date); 22
      * </pre>
      *
      * @param date 日期对象
      * @return 小时（24制）
      */
-    public static int get24Hour(Date date) {
-        LocalDateTime localDateTime = DateConverter.to(Preconditions.requireNonNull(date, "date == null"));
-        return localDateTime.getHour();
+    public static int get24Hour(@NotNull Date date) {
+        Preconditions.requireNonNull(date, "date");
+        return LocalDateTimeUtil.of(date).getHour();
     }
 
     /**
      * 从日期中获取小时（12制）
      * <pre>
-     *     比如时间2014-05-12 22:10:00  DateCalcUtils.get12Hour(date); 10
+     *     比如时间2014-05-12 22:10:00  DateUtil.get12Hour(date); 10
      * </pre>
      *
      * @param date 日期对象
      * @return 小时（12制）
      */
-    public static int get12Hour(Date date) {
-        return get24Hour(Preconditions.requireNonNull(date, "date == null")) % 12;
+    public static int get12Hour(@NotNull Date date) {
+        return get24Hour(date) % 12;
     }
 
     /**
      * 从日期中获取分钟
      * <pre>
-     *     比如时间2014-05-12 22:10:00  DateCalcUtils.getMinute(date); 10
+     *     比如时间2014-05-12 22:10:00  DateUtil.getMinute(date); 10
      * </pre>
      *
      * @param date 日期对象
      * @return 分钟
      */
-    public static int getMinute(Date date) {
-        LocalDateTime localDateTime = DateConverter.to(Preconditions.requireNonNull(date, "date == null"));
-        return localDateTime.getMinute();
+    public static int getMinute(@NotNull Date date) {
+        Preconditions.requireNonNull(date, "date");
+        return LocalDateTimeUtil.of(date).getMinute();
     }
 
     /**
      * 从日期中获取秒数
      * <pre>
-     *     比如时间2014-05-12 22:10:00  DateCalcUtils.getSecond(date); 0
+     *     比如时间2014-05-12 22:10:10  DateUtil.getSecond(date); 10
      * </pre>
      *
      * @param date 日期对象
      * @return 秒数
      */
-    public static int getSecond(Date date) {
-        LocalDateTime localDateTime = DateConverter.to(Preconditions.requireNonNull(date, "date == null"));
-        return localDateTime.getSecond();
+    public static int getSecond(@NotNull Date date) {
+        Preconditions.requireNonNull(date, "date");
+        return LocalDateTimeUtil.of(date).getSecond();
     }
 
-    public static int getMilliSecond(Date date) {
-        LocalDateTime localDateTime = DateConverter.to(Preconditions.requireNonNull(date, "date == null"));
-        return localDateTime.get(ChronoField.MILLI_OF_SECOND);
+    /**
+     * 从日期中获取秒数
+     * <pre>
+     *     比如时间2014-05-12 22:10:00.333  DateUtil.getSecond(date); 333
+     * </pre>
+     *
+     * @param date 日期对象
+     * @return 秒数
+     */
+    public static int getMilliSecond(@NotNull Date date) {
+        Preconditions.requireNonNull(date, "date");
+        return (int) (date.getTime() % 1000L);
     }
 
 }
