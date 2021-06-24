@@ -9,7 +9,7 @@ public class ApacheHttpClientBuilder extends HttpClientBuilder {
 
     @Override
     public HttpClient build(@Nullable HttpOptions options) {
-        return new ApacheHttpClient(options);
+        return new HttpComponentsHttpClient(options);
     }
 
 }

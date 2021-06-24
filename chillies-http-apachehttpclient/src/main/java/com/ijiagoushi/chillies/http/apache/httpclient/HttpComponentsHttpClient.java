@@ -7,9 +7,11 @@ import com.ijiagoushi.chillies.core.lang.CharsetUtil;
 import com.ijiagoushi.chillies.core.lang.CollectionUtil;
 import com.ijiagoushi.chillies.core.lang.Preconditions;
 import com.ijiagoushi.chillies.core.lang.StringUtil;
+import com.ijiagoushi.chillies.http.HttpHeaders;
 import com.ijiagoushi.chillies.http.HttpRequest;
 import com.ijiagoushi.chillies.http.HttpResponse;
 import com.ijiagoushi.chillies.http.*;
+import com.ijiagoushi.chillies.http.constants.HeaderName;
 import org.apache.http.*;
 import org.apache.http.auth.AuthScope;
 import org.apache.http.auth.UsernamePasswordCredentials;
@@ -31,42 +33,31 @@ import org.apache.http.util.EntityUtils;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.InputStreamReader;
-import java.io.Reader;
+import java.io.*;
 import java.net.URISyntaxException;
 import java.nio.charset.Charset;
-import java.util.ArrayList;
-import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
 
 /**
- * 基于{@code Apache HttpClient}包装实现
+ * 基于{@code Apache HttpComponents}包装实现
  *
  * @author miles.tang
  */
-public class ApacheHttpClient implements HttpClient {
-    private static final String ACCEPT_HEADER_NAME = "Accept";
-
-    /**
-     * The HTTP Content-Length header field name.
-     */
-    public static final String CONTENT_LENGTH = "Content-Length";
+public class HttpComponentsHttpClient implements HttpClient {
 
     private final org.apache.http.client.HttpClient httpClient;
 
-    public ApacheHttpClient() {
+    public HttpComponentsHttpClient() {
         this((HttpOptions) null);
     }
 
-    public ApacheHttpClient(@NotNull org.apache.http.client.HttpClient httpClient) {
+    public HttpComponentsHttpClient(@NotNull org.apache.http.client.HttpClient httpClient) {
         this.httpClient = Preconditions.requireNonNull(httpClient, "httpClient == null");
     }
 
-    public ApacheHttpClient(@Nullable HttpOptions options) {
+    public HttpComponentsHttpClient(@Nullable HttpOptions options) {
         this.httpClient = build(options, null);
     }
 
@@ -120,6 +111,8 @@ public class ApacheHttpClient implements HttpClient {
             throw new IoRuntimeException("URL '" + request.url() + "' couldn't be parsed into a URI", e);
         } catch (IOException e) {
             throw new IoRuntimeException(e);
+        } finally {
+            Utils.closeParts(request.body());
         }
     }
 
@@ -134,11 +127,11 @@ public class ApacheHttpClient implements HttpClient {
         String headerName;
         for (Map.Entry<String, List<String>> entry : request.headers().entrySet()) {
             headerName = entry.getKey();
-            if (headerName.equalsIgnoreCase(ACCEPT_HEADER_NAME)) {
+            if (headerName.equalsIgnoreCase(HeaderName.ACCEPT.toString())) {
                 hasAcceptHeader = true;
             }
 
-            if (StringUtil.equalsIgnoreCase(headerName, CONTENT_LENGTH)) {
+            if (StringUtil.equalsIgnoreCase(headerName, HeaderName.CONTENT_LENGTH.toString())) {
                 // The 'Content-Length' header is always set by the Apache client and it
                 // doesn't like us to set it as well.
                 continue;
@@ -149,7 +142,7 @@ public class ApacheHttpClient implements HttpClient {
             }
         }
         if (!hasAcceptHeader) {
-            requestBuilder.addHeader(ACCEPT_HEADER_NAME, "*/*");
+            requestBuilder.addHeader(HeaderName.ACCEPT.toString(), "*/*");
         }
 
         // request body
@@ -223,15 +216,15 @@ public class ApacheHttpClient implements HttpClient {
         int statusCode = statusLine.getStatusCode();
         String reason = statusLine.getReasonPhrase();
 
-        Map<String, List<String>> headers = new LinkedHashMap<>();
+        HttpHeaders httpHeaders = new HttpHeaders();
         for (Header header : httpResponse.getAllHeaders()) {
-            headers.computeIfAbsent(header.getName(), k -> new ArrayList<>()).add(header.getValue());
+            httpHeaders.append(header.getName(), header.getValue());
         }
 
         return HttpResponse.builder()
-                .status(statusCode)
+                .rawStatus(statusCode)
                 .reason(reason)
-                .headers(headers)
+                .headers(httpHeaders)
                 .request(request)
                 .body(toBody(httpResponse))
                 .build();
@@ -285,7 +278,13 @@ public class ApacheHttpClient implements HttpClient {
 
             @Override
             public void close() throws IOException {
-                EntityUtils.consume(entity);
+                try {
+                    EntityUtils.consume(entity);
+                } finally {
+                    if (httpResponse instanceof Cloneable) {
+                        IOUtil.closeQuietly(((Closeable) httpResponse));
+                    }
+                }
             }
 
             @NotNull

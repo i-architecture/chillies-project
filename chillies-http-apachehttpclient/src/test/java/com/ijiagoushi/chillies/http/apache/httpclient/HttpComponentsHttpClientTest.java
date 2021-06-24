@@ -9,7 +9,7 @@ import static org.junit.jupiter.api.Assertions.assertNotNull;
  * @author miles.tang at 2021-02-24
  * @since 1.0
  */
-public class ApacheHttpClientTest {
+public class HttpComponentsHttpClientTest {
 
     @Test
     public void build() {
