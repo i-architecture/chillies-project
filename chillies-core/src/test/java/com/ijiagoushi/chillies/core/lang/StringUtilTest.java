@@ -468,10 +468,10 @@ public class StringUtilTest {
     @Test
     public void replace2() {
         String str = null;
-        assertNull(StringUtil.replace(str, null, null));
+        assertNull(StringUtil.replace(str, (String) null, null));
 
         str = "";
-        assertEquals(StringUtil.replace(str, null, null), "");
+        assertEquals("", StringUtil.replace(str, (String) null, null));
 
         str = "com.mzlion.core";
         assertEquals(StringUtil.replace(str, ".", null), "com.mzlion.core");

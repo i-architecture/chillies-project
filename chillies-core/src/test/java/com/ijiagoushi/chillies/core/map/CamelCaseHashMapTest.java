@@ -10,10 +10,10 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
  * @author miles.tang at 2021-01-21
  * @since 1.0
  */
-class CamelCaseHashMapTest {
+public class CamelCaseHashMapTest {
 
     @Test
-    void customKey() {
+    public void customKey() {
         Map<String, String> map = new CamelCaseHashMap<>();
         map.put("userPwd", "123123");
         assertEquals("123123", map.get("userPwd"));

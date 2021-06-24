@@ -13,10 +13,10 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
  * @author miles.tang at 2021-01-14
  * @since 1.0
  */
-class BeanUtilTest {
+public class BeanUtilTest {
 
     @Test
-    void isBeanType() {
+    public void isBeanType() {
         assertFalse(BeanUtil.isBeanType(Bean1.class));
         assertTrue(BeanUtil.isBeanType(Bean2.class));
         assertTrue(BeanUtil.isBeanType(Bean3.class));
@@ -28,43 +28,43 @@ class BeanUtilTest {
     }
 
     @Test
-    void getPropertyDescriptorList() {
+    public void getPropertyDescriptorList() {
     }
 
     @Test
-    void getPropertyDescriptorMap() {
+    public void getPropertyDescriptorMap() {
     }
 
     @Test
-    void getPropertyDescriptor() {
+    public void getPropertyDescriptor() {
     }
 
     @Test
-    void getPropertyValue() {
+    public void getPropertyValue() {
     }
 
     @Test
-    void beanToMap() {
+    public void beanToMap() {
     }
 
     @Test
-    void testBeanToMap() {
+    public void testBeanToMap() {
     }
 
     @Test
-    void testBeanToMap1() {
+    public void testBeanToMap1() {
     }
 
     @Test
-    void toMapAsValueString() {
+    public void toMapAsValueString() {
     }
 
     @Test
-    void copyProperties() {
+    public void copyProperties() {
     }
 
     @Test
-    void testCopyProperties() {
+    public void testCopyProperties() {
     }
 
     public static class Bean1 {

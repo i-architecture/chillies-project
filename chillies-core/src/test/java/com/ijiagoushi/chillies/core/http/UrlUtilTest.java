@@ -10,78 +10,78 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
  * @author miles.tang at 2021-02-05
  * @since 1.0
  */
-class UrlUtilTest {
+public class UrlUtilTest {
 
     @Test
-    void encode() {
+    public void encode() {
     }
 
     @Test
-    void testEncode() {
+    public void testEncode() {
     }
 
     @Test
-    void testEncode1() {
+    public void testEncode1() {
     }
 
     @Test
-    void addParam() {
+    public void addParam() {
     }
 
     @Test
-    void testAddParam() {
+    public void testAddParam() {
     }
 
     @Test
-    void addParams() {
+    public void addParams() {
     }
 
     @Test
-    void testAddParams() {
+    public void testAddParams() {
     }
 
     @Test
-    void decode() {
+    public void decode() {
     }
 
     @Test
-    void testDecode() {
+    public void testDecode() {
     }
 
     @Test
-    void openStream() {
+    public void openStream() {
     }
 
     @Test
-    void getUrl() {
+    public void getUrl() {
     }
 
     @Test
-    void getJarFile() {
+    public void getJarFile() {
     }
 
     @Test
-    void fromUrlParams() {
+    public void fromUrlParams() {
         String urlParams = "";
-        MultiValueMap<String, String> params = UrlUtil.parseUrlParams(urlParams);
+        MultiValueMap<String, String> params = UrlUtil.parseByUrlQueryString(urlParams);
         assertEquals(params, new MultiValueLinkedMap<String, String>());
 
         urlParams = "a";
-        params = UrlUtil.parseUrlParams(urlParams);
+        params = UrlUtil.parseByUrlQueryString(urlParams);
         MultiValueMap<String, String> result = new MultiValueLinkedMap<>(4);
         result.add("a", null);
         assertEquals(params, result);
         System.out.println(urlParams + "\t->\t\t" + params);
 
         urlParams = "username=";
-        params = UrlUtil.parseUrlParams(urlParams);
+        params = UrlUtil.parseByUrlQueryString(urlParams);
         result = new MultiValueLinkedMap<>(4);
         result.add("username", null);
         assertEquals(params, result);
         System.out.println(urlParams + "\t->\t\t" + params);
 
         urlParams = "username=admin&password=&";
-        params = UrlUtil.parseUrlParams(urlParams);
+        params = UrlUtil.parseByUrlQueryString(urlParams);
         result = new MultiValueLinkedMap<>(4);
         result.add("username", "admin");
         result.add("password", null);

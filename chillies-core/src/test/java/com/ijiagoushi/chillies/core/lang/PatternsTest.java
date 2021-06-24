@@ -10,10 +10,10 @@ import static org.junit.jupiter.api.Assertions.*;
  * @author miles.tang at 2021-01-20
  * @since 1.0
  */
-class PatternsTest {
+public class PatternsTest {
 
     @Test
-    void general() {
+    public void general() {
         assertFalse(Patterns.GENERAL.matcher("").matches());
         assertTrue(Patterns.GENERAL.matcher("9").matches());
         assertTrue(Patterns.GENERAL.matcher("a").find());
@@ -28,7 +28,7 @@ class PatternsTest {
     }
 
     @Test
-    void number() {
+    public void number() {
         assertFalse(Patterns.NUMBERS.matcher("").find());
         assertFalse(Patterns.NUMBERS.matcher("a").find());
         assertFalse(Patterns.NUMBERS.matcher("A").find());
@@ -41,7 +41,7 @@ class PatternsTest {
     }
 
     @Test
-    void chineseAny() {
+    public void chineseAny() {
         assertFalse(Patterns.CHINESE_ANY.matcher("").find());
         assertFalse(Patterns.CHINESE_ANY.matcher("-").find());
         assertFalse(Patterns.CHINESE_ANY.matcher("_").find());
@@ -58,7 +58,7 @@ class PatternsTest {
     }
 
     @Test
-    void chineses() {
+    public void chineses() {
         assertFalse(Patterns.CHINESES.matcher("").find());
         assertFalse(Patterns.CHINESES.matcher("-").find());
         assertFalse(Patterns.CHINESES.matcher("_").find());

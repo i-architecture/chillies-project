@@ -11,10 +11,10 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
  * @author miles.tang at 2021-01-20
  * @since 1.0
  */
-class ClassScannerTest {
+public class ClassScannerTest {
 
     @Test
-    void scan() {
+    public void scan() {
         Set<Class<?>> classes = ClassScanner.scanPackage("com.ijiagoushi");
         assertNotNull(classes);
         assertTrue(classes.size() > 0);

@@ -6,93 +6,93 @@ import org.junit.jupiter.api.Test;
  * @author miles.tang at 2021-01-25
  * @since 1.0
  */
-class MapUtilTest {
+public class MapUtilTest {
 
     @Test
-    void newHashMap() {
+    public void newHashMap() {
     }
 
     @Test
-    void newLinkedHashMap() {
+    public void newLinkedHashMap() {
     }
 
     @Test
-    void getStr() {
+    public void getStr() {
     }
 
     @Test
-    void testGetStr() {
+    public void testGetStr() {
     }
 
     @Test
-    void getInt() {
+    public void getInt() {
     }
 
     @Test
-    void testGetInt() {
+    public void testGetInt() {
     }
 
     @Test
-    void getDouble() {
+    public void getDouble() {
     }
 
     @Test
-    void testGetDouble() {
+    public void testGetDouble() {
     }
 
     @Test
-    void getFloat() {
+    public void getFloat() {
     }
 
     @Test
-    void testGetFloat() {
+    public void testGetFloat() {
     }
 
     @Test
-    void getShort() {
+    public void getShort() {
     }
 
     @Test
-    void testGetShort() {
+    public void testGetShort() {
     }
 
     @Test
-    void getBool() {
+    public void getBool() {
     }
 
     @Test
-    void testGetBool() {
+    public void testGetBool() {
     }
 
     @Test
-    void getChar() {
+    public void getChar() {
     }
 
     @Test
-    void testGetChar() {
+    public void testGetChar() {
     }
 
     @Test
-    void getByte() {
+    public void getByte() {
     }
 
     @Test
-    void testGetByte() {
+    public void testGetByte() {
     }
 
     @Test
-    void getLong() {
+    public void getLong() {
     }
 
     @Test
-    void testGetLong() {
+    public void testGetLong() {
     }
 
     @Test
-    void get() {
+    public void get() {
     }
 
     @Test
-    void testGet() {
+    public void testGet() {
     }
 }

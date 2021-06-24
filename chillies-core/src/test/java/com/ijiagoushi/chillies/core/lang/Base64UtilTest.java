@@ -31,8 +31,8 @@ public class Base64UtilTest {
 
     @Test
     public void testEncodeInputStream() {
-        ByteArrayInputStream bais = new ByteArrayInputStream("com.jishukezhan.core.lang.Base64Util".getBytes());
-        assertEquals(Base64Util.encode(bais), "Y29tLmppc2h1a2V6aGFuLmNvcmUubGFuZy5CYXNlNjRVdGls");
+        ByteArrayInputStream bais = new ByteArrayInputStream("com.ijiagoushi.chillies.core.lang.Base64Util".getBytes());
+        assertEquals(Base64Util.encode(bais), "Y29tLmlqaWFnb3VzaGkuY2hpbGxpZXMuY29yZS5sYW5nLkJhc2U2NFV0aWw=");
     }
 
     @Test

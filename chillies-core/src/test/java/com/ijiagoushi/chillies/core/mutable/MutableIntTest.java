@@ -9,10 +9,10 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
  * @author miles.tang at 2021-01-21
  * @since 1.0
  */
-class MutableIntTest {
+public class MutableIntTest {
 
     @Test
-    void get() throws Exception {
+    public void get() throws Exception {
         final MutableInt mutableInt = new MutableInt(1);
         Thread thread = new Thread(() -> {
             mutableInt.set(2);
