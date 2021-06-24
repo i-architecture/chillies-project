@@ -10,6 +10,8 @@ import java.nio.charset.Charset;
 
 /**
  * HTTP响应内容接口
+ *
+ * @author miles.tang
  */
 public interface HttpResponseBody extends Closeable {
 

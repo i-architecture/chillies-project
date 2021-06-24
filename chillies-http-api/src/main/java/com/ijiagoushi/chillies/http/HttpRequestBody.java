@@ -54,11 +54,12 @@ public class HttpRequestBody {
     }
 
     public static HttpRequestBody create(@Nullable ContentType contentType, @NotNull String content) {
-        Charset encoding = CharsetUtil.UTF_8;
+        Charset encoding = null;
         if (contentType != null) {
             encoding = contentType.getCharset();
         }
-        return new HttpRequestBody(contentType, content.getBytes(encoding));
+        byte[] data = content.getBytes(CharsetUtil.getCharset(encoding, CharsetUtil.UTF_8));
+        return new HttpRequestBody(contentType, data);
     }
 
     public static HttpRequestBody create(@Nullable ContentType contentType, @NotNull byte[] data) {

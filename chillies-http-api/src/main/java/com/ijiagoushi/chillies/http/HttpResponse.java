@@ -6,6 +6,9 @@ import com.ijiagoushi.chillies.core.io.IOUtil;
 import com.ijiagoushi.chillies.core.lang.CharsetUtil;
 import com.ijiagoushi.chillies.core.lang.CollectionUtil;
 import com.ijiagoushi.chillies.core.lang.Preconditions;
+import com.ijiagoushi.chillies.http.exceptions.HttpClientErrorException;
+import com.ijiagoushi.chillies.http.exceptions.HttpServerErrorException;
+import com.ijiagoushi.chillies.http.exceptions.UnknownHttpStatusCodeException;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -14,12 +17,17 @@ import java.nio.charset.Charset;
 import java.util.List;
 import java.util.Map;
 
+/**
+ * 通用的HTTP响应类
+ *
+ * @author miles.tang
+ */
 public class HttpResponse implements Closeable {
 
     /**
      * HTTP状态码
      */
-    int status;
+    int rawStatus;
 
     /**
      * HTTP状态消息
@@ -29,7 +37,7 @@ public class HttpResponse implements Closeable {
     /**
      * 响应头
      */
-    Map<String, List<String>> headers;
+    HttpHeaders headers;
 
     /**
      * 响应内容
@@ -42,7 +50,7 @@ public class HttpResponse implements Closeable {
     HttpRequest request;
 
     private HttpResponse(Builder builder) {
-        this.status = builder.status;
+        this.rawStatus = builder.rawStatus;
         this.reason = builder.reason;
         this.headers = builder.headers;
         this.body = builder.body;
@@ -62,8 +70,17 @@ public class HttpResponse implements Closeable {
      * <p>
      * See <a href="http://www.w3.org/Protocols/rfc2616/rfc2616-sec10.html" >rfc2616</a>
      */
-    public int status() {
-        return status;
+    public int rawStatus() {
+        return rawStatus;
+    }
+
+    /**
+     * 返回HTTP包装过的状态码
+     *
+     * @return 状态码
+     */
+    public HttpStatus status() {
+        return HttpStatus.valueOf(rawStatus());
     }
 
     /**
@@ -89,7 +106,7 @@ public class HttpResponse implements Closeable {
 
     @Override
     public String toString() {
-        StringBuilder builder = new StringBuilder("HTTP/1.1 ").append(status);
+        StringBuilder builder = new StringBuilder("HTTP/1.1 ").append(rawStatus);
         if (reason != null) {
             builder.append(' ').append(reason);
         }
@@ -116,12 +133,49 @@ public class HttpResponse implements Closeable {
         IOUtil.closeQuietly(body);
     }
 
+    /**
+     * 检查HTTP status code是否有错误
+     *
+     * @throws HttpClientErrorException       客户端异常
+     * @throws HttpServerErrorException       服务端异常
+     * @throws UnknownHttpStatusCodeException 未知状态码异常
+     */
+    public void checkStatus() {
+        if (hasError()) {
+            HttpStatus statusCode = status();
+            byte[] responseBody = IOUtil.readBytes(body.byteStream());
+            switch (statusCode.series()) {
+                case CLIENT_ERROR:
+                    throw new HttpClientErrorException(statusCode, reason, headers, responseBody, null, request);
+                case SERVER_ERROR:
+                    throw new HttpServerErrorException(statusCode, reason, headers, responseBody, null, request);
+                default:
+                    throw new UnknownHttpStatusCodeException(statusCode.value(), reason, headers, responseBody, null, request);
+            }
+        }
+    }
+
+    /**
+     * 判断Response是否有错误
+     *
+     * @return {@code true}/{@code false}
+     */
+    public boolean hasError() {
+        HttpStatus statusCode = status();
+        return (statusCode.series() == HttpStatus.Series.CLIENT_ERROR || statusCode.series() == HttpStatus.Series.SERVER_ERROR);
+    }
+
+    /**
+     * {@linkplain HttpResponse}的构造者
+     *
+     * @author miles.tang
+     */
     public static class Builder {
 
         /**
          * HTTP状态码
          */
-        int status;
+        int rawStatus;
 
         /**
          * HTTP状态消息
@@ -131,7 +185,7 @@ public class HttpResponse implements Closeable {
         /**
          * 响应头
          */
-        Map<String, List<String>> headers;
+        HttpHeaders headers;
 
         /**
          * 响应内容
@@ -147,7 +201,7 @@ public class HttpResponse implements Closeable {
         }
 
         Builder(@NotNull HttpResponse source) {
-            this.status = Preconditions.requireNonNull(source).status;
+            this.rawStatus = Preconditions.requireNonNull(source).rawStatus;
             this.reason = source.reason;
             this.headers = source.headers;
             this.body = source.body;
@@ -155,10 +209,10 @@ public class HttpResponse implements Closeable {
         }
 
         /**
-         * @see HttpResponse#status
+         * @see HttpResponse#rawStatus
          */
-        public Builder status(int status) {
-            this.status = status;
+        public Builder rawStatus(int rawStatus) {
+            this.rawStatus = rawStatus;
             return this;
         }
 
@@ -173,7 +227,7 @@ public class HttpResponse implements Closeable {
         /**
          * @see HttpResponse#headers
          */
-        public Builder headers(Map<String, List<String>> headers) {
+        public Builder headers(HttpHeaders headers) {
             this.headers = headers;
             return this;
         }

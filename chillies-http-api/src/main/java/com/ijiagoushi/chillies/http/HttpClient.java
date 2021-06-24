@@ -6,6 +6,7 @@ import com.ijiagoushi.chillies.core.io.IOUtil;
 import com.ijiagoushi.chillies.core.lang.CollectionUtil;
 import com.ijiagoushi.chillies.core.lang.StringUtil;
 import com.ijiagoushi.chillies.core.map.MultiValueMap;
+import com.ijiagoushi.chillies.http.constants.HeaderName;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -57,6 +58,8 @@ public interface HttpClient {
                 return convertResponse(connection, request);
             } catch (IOException e) {
                 throw new IoRuntimeException(e);
+            } finally {
+                Utils.closeParts(request.body());
             }
         }
 
@@ -78,7 +81,7 @@ public interface HttpClient {
                 connection.setInstanceFollowRedirects(httpOptions.followRedirects());
             }
             connection.setRequestMethod(request.method().name());
-            List<String> contentEncodingValues = request.headers().get(CONTENT_ENCODING);
+            List<String> contentEncodingValues = request.headers().get(HeaderName.CONTENT_ENCODING.toString());
             boolean gzipEncodedRequest =
                     contentEncodingValues != null && contentEncodingValues.contains(ENCODING_GZIP);
             boolean deflateEncodedRequest =
@@ -90,7 +93,7 @@ public interface HttpClient {
                     hasAcceptHeader = true;
                 }
                 for (String value : request.headers().get(field)) {
-                    if (field.equals(CONTENT_LENGTH)) {
+                    if (field.equals(HeaderName.CONTENT_LENGTH.toString())) {
                         if (!gzipEncodedRequest && !deflateEncodedRequest) {
                             contentLength = Integer.valueOf(value);
                             connection.addRequestProperty(field, value);
@@ -141,7 +144,7 @@ public interface HttpClient {
 //            int index = url.indexOf('?');
 //            if (index > 0) {
 //                String paramStr = url.substring(index + 1);
-//                MultiValueMap<String, String> paramMap = UrlUtil.parseUrlParams(paramStr);
+//                MultiValueMap<String, String> paramMap = UrlUtil.parseByUrlQueryString(paramStr);
 //                StringBuilder buffer = new StringBuilder(url.substring(0, index));
 //                for (Map.Entry<String, List<String>> entry : paramMap.entrySet()) {
 //                    for (String val : entry.getValue()) {
@@ -174,24 +177,15 @@ public interface HttpClient {
                 stream = connection.getInputStream();
             }
             return HttpResponse.builder()
-                    .status(status)
+                    .rawStatus(status)
                     .reason(reason)
-                    .headers(headers)
+                    .headers(new HttpHeaders(headers))
                     .request(request)
                     .body(stream, length)
                     .build();
         }
     }
 
-    /**
-     * The HTTP Content-Length header field name.
-     */
-    String CONTENT_LENGTH = "Content-Length";
-
-    /**
-     * The HTTP Content-Encoding header field name.
-     */
-    String CONTENT_ENCODING = "Content-Encoding";
 
     /**
      * Value for the Content-Encoding header that indicates that GZIP encoding is in use.

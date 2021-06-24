@@ -20,9 +20,9 @@ import java.util.List;
  */
 public class HttpMultipartBody extends HttpRequestBody {
 
-    private String boundary;
+    private final String boundary;
 
-    private List<Part> parts;
+    private final List<Part> parts;
 
     HttpMultipartBody(Builder builder) {
         this.contentType = builder.contentType;
@@ -45,11 +45,11 @@ public class HttpMultipartBody extends HttpRequestBody {
 
     public static class Part {
 
-        private String name;
+        private final String name;
 
         private String value;
 
-        private ContentType contentType;
+        private final ContentType contentType;
 
         private HttpRequestBody body;
 
@@ -149,7 +149,7 @@ public class HttpMultipartBody extends HttpRequestBody {
 
         private ContentType contentType;
 
-        private List<Part> parts = new ArrayList<>();
+        private final List<Part> parts = new ArrayList<>();
 
         public Builder() {
             this.contentType = ContentType.MULTIPART_FORM_DATA;

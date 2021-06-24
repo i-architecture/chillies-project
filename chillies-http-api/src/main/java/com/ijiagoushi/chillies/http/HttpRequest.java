@@ -2,15 +2,18 @@ package com.ijiagoushi.chillies.http;
 
 import com.ijiagoushi.chillies.core.http.UrlUtil;
 import com.ijiagoushi.chillies.core.lang.CollectionUtil;
+import com.ijiagoushi.chillies.core.lang.ObjectUtil;
 import com.ijiagoushi.chillies.core.lang.Preconditions;
-import com.ijiagoushi.chillies.core.lang.StringUtil;
 import com.ijiagoushi.chillies.core.map.MultiValueLinkedMap;
 import com.ijiagoushi.chillies.core.map.MultiValueMap;
 import com.ijiagoushi.chillies.http.constants.HttpMethod;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.List;
+import java.util.Map;
 import java.util.function.BiConsumer;
 import java.util.function.Consumer;
 
@@ -34,7 +37,7 @@ public final class HttpRequest {
     /**
      * 请求消息头
      */
-    private final Map<String, List<String>> headers;
+    private final MultiValueMap<String, String> headers;
 
     /**
      * URL参数
@@ -48,12 +51,12 @@ public final class HttpRequest {
 
     HttpRequest(Builder builder) {
         this.method = builder.method;
-        this.headers = Collections.unmodifiableMap(builder.headers);
+        this.headers = new MultiValueLinkedMap<>(builder.headerMap);
         this.queryParams = new MultiValueLinkedMap<>(builder.queryParams);
         int index = builder.url.indexOf('?');
         if (index > 0) {
             String paramStr = builder.url.substring(index + 1);
-            this.queryParams.addAll(UrlUtil.parseUrlParams(paramStr));
+            this.queryParams.addAll(UrlUtil.parseByUrlQueryString(paramStr));
             this.url = builder.url.substring(0, index);
         } else {
             this.url = builder.url;
@@ -115,7 +118,7 @@ public final class HttpRequest {
         /**
          * 请求消息头
          */
-        private final Map<String, List<String>> headers;
+        private final MultiValueMap<String, String> headerMap;
 
         private final MultiValueMap<String, String> queryParams;
 
@@ -126,14 +129,14 @@ public final class HttpRequest {
 
         public Builder() {
             this.method = HttpMethod.GET;
-            this.headers = new HashMap<>();
+            this.headerMap = new MultiValueLinkedMap<>();
             this.queryParams = new MultiValueLinkedMap<>();
         }
 
         public Builder(HttpRequest request) {
             this.method = request.method;
             this.url = request.url;
-            this.headers = new HashMap<>(request.headers);
+            this.headerMap = new MultiValueLinkedMap<>(request.headers);
             this.body = request.body;
             this.queryParams = request.queryParams;
         }
@@ -154,7 +157,7 @@ public final class HttpRequest {
 
             List<String> values = new ArrayList<>();
             values.add(value);
-            headers.put(name, values);
+            headerMap.put(name, values);
             return this;
         }
 
@@ -162,23 +165,23 @@ public final class HttpRequest {
             Preconditions.requireNotEmpty(name, "name is null or empty");
             Preconditions.requireNonNull(value, "value == null");
 
-            List<String> values = headers.computeIfAbsent(name, k -> new ArrayList<>());
+            List<String> values = headerMap.computeIfAbsent(name, k -> new ArrayList<>());
             values.add(value);
             return this;
         }
 
         public Builder removeHeader(String name) {
-            headers.remove(name);
+            headerMap.remove(name);
             return this;
         }
 
         public Builder headers(HttpHeaders headers) {
             if (CollectionUtil.isNotEmpty(headers)) {
                 headers.forEach((BiConsumer<String, Object>) (name, values) -> {
-                    if (StringUtil.isEmpty(name) || values == null) {
+                    if (ObjectUtil.isAnyNull(name, values)) {
                         return;
                     }
-                    List<String> oValues = headers.computeIfAbsent(name, k -> new ArrayList<>());
+                    List<String> oValues = headerMap.computeIfAbsent(name, k -> new ArrayList<>());
                     if (values instanceof Collection<?>) {
                         ((Collection<?>) values).forEach((Consumer<Object>) value -> {
                             if (value != null) {
@@ -190,13 +193,14 @@ public final class HttpRequest {
                     }
                 });
             }
+
             return this;
         }
 
         public Builder queryParams(Map<String, ?> queryParamMap) {
             if (CollectionUtil.isNotEmpty(queryParamMap)) {
                 queryParamMap.forEach((BiConsumer<String, Object>) (name, values) -> {
-                    if (StringUtil.isEmpty(name) || values == null) {
+                    if (ObjectUtil.isAnyNull(name, values)) {
                         return;
                     }
                     List<String> oValues = queryParams.computeIfAbsent(name, k -> new ArrayList<>());

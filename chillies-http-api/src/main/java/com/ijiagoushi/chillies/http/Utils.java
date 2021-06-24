@@ -1,11 +1,13 @@
 package com.ijiagoushi.chillies.http;
 
+import com.ijiagoushi.chillies.core.io.IOUtil;
 import com.ijiagoushi.chillies.core.lang.CharsetUtil;
 import com.ijiagoushi.chillies.core.lang.CollectionUtil;
 import com.ijiagoushi.chillies.core.lang.Preconditions;
 import com.ijiagoushi.chillies.core.lang.StringUtil;
 import com.ijiagoushi.chillies.http.constants.HeaderName;
 
+import java.io.InputStream;
 import java.util.List;
 import java.util.Map;
 import java.util.regex.Matcher;
@@ -59,6 +61,21 @@ public class Utils {
             return matcher.group(1);
         }
         return null;
+    }
+
+    public static void closeParts(HttpRequestBody requestBody) {
+        if (requestBody instanceof HttpMultipartBody) {
+            HttpMultipartBody multipartBody = (HttpMultipartBody) requestBody;
+            List<HttpMultipartBody.Part> parts = multipartBody.getParts();
+            if (CollectionUtil.isNotEmpty(parts)) {
+                parts.forEach(part -> {
+                    InputStream in = part.getIn();
+                    if (in != null) {
+                        IOUtil.closeQuietly(in);
+                    }
+                });
+            }
+        }
     }
 
 }
