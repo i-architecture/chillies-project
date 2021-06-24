@@ -357,6 +357,17 @@ public class ZipUtil {
      *
      * @param zipFile   zip文件
      * @param targetDir 解压到的目录
+     * @return 解压的目录
+     */
+    public static File unzip(File zipFile, File targetDir) {
+        return unzip(zipFile, targetDir, CharsetUtil.UTF_8);
+    }
+
+    /**
+     * 解压
+     *
+     * @param zipFile   zip文件
+     * @param targetDir 解压到的目录
      * @param charset   编码
      * @return 解压的目录
      */

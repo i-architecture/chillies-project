@@ -5,6 +5,7 @@ import com.ijiagoushi.chillies.core.exceptions.ReflectUtilException;
 import com.ijiagoushi.chillies.core.lang.ArrayUtil;
 import com.ijiagoushi.chillies.core.lang.Preconditions;
 import com.ijiagoushi.chillies.core.lang.SimpleCache;
+import com.ijiagoushi.chillies.core.lang.StringUtil;
 
 import java.lang.reflect.AccessibleObject;
 import java.lang.reflect.Constructor;
@@ -91,7 +92,7 @@ public class ReflectUtil {
         }
         try {
             return constructor.newInstance(parameters);
-        } catch (ReflectiveOperationException e) {
+        } catch (ReflectiveOperationException | IllegalArgumentException e) {
             throw new NewInstanceException(e);
         }
     }
@@ -183,8 +184,10 @@ public class ReflectUtil {
 
         try {
             return (T) method.invoke(ClassUtil.isStatic(method) ? null : obj, actualArgs);
-        } catch (ReflectiveOperationException e) {
-            throw new ReflectUtilException(e);
+        } catch (ReflectiveOperationException | IllegalArgumentException e) {
+            String message = StringUtil.format("反射方法调用异常[::]methodName = {} ,obj = {} , args = {}",
+                    method.getName(), obj, ArrayUtil.join(args));
+            throw new ReflectUtilException(message, e);
         }
     }
 
