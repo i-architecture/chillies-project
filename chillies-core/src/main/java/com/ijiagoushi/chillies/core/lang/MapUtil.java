@@ -1,5 +1,7 @@
 package com.ijiagoushi.chillies.core.lang;
 
+import com.ijiagoushi.chillies.core.convert.ConvertUtil;
+
 import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.Map;
@@ -276,8 +278,7 @@ public class MapUtil {
      * @return 值
      */
     public static <T> T get(Map<?, ?> map, Object key, Class<T> type, T defaultValue) {
-        // return (null == map) ? null : ConvertUtil.convert(type, map.get(key), defaultValue);
-        return null;
+        return (null == map) ? null : ConvertUtil.convertQuietly(type, map.get(key), defaultValue);
     }
 
 

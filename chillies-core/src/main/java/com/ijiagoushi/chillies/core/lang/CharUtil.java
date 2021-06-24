@@ -63,6 +63,11 @@ public class CharUtil {
      */
     public static final char SPACE = ' ';
 
+    /**
+     * 字符常量：冒号 {@code ':'}
+     */
+    public static final char COLON = ':';
+
     private static final int ASCII_LENGTH = 128;
     private static final String[] CACHE = new String[ASCII_LENGTH];
 
@@ -73,6 +78,30 @@ public class CharUtil {
     }
 
     //endregion
+
+    /**
+     * 是否空白符，空白符包括空格、制表符、全角空格和不间断空格
+     *
+     * @param ch 字符
+     * @return 是否空白符
+     * @see Character#isWhitespace(int)
+     * @see Character#isSpaceChar(int)
+     */
+    public static boolean isBlankChar(char ch) {
+        return isBlankChar((int) ch);
+    }
+
+    /**
+     * 是否空白符，空白符包括空格、制表符、全角空格和不间断空格
+     *
+     * @param codePoint 代码点
+     * @return 是否空白符
+     * @see Character#isWhitespace(int)
+     * @see Character#isSpaceChar(int)
+     */
+    public static boolean isBlankChar(int codePoint) {
+        return Character.isWhitespace(codePoint) || Character.isSpaceChar(codePoint) || codePoint == '\ufeff' || codePoint == '\u2021';
+    }
 
     /**
      * 是否为Windows或者Linux（Unix）文件分隔符<br>

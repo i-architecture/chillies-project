@@ -18,13 +18,18 @@ public class PlaceholderPropertiesResolver {
     private String placeholderPrefix = "${";
     private String placeholderSuffix = "}";
 
-    private List<Resource> locations;
+    private final List<Resource> locations;
 
     private Map<String, String> resolveProperties;
 
     private Map<String, String> variables;
 
     public PlaceholderPropertiesResolver(String... locations) {
+        this.locations = new ResourceLoader(locations).load();
+        resolve();
+    }
+
+    public PlaceholderPropertiesResolver(List<String> locations) {
         this.locations = new ResourceLoader(locations).load();
         resolve();
     }

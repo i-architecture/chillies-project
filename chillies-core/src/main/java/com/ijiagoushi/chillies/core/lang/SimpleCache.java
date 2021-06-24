@@ -9,6 +9,7 @@ import java.util.function.Function;
 
 /**
  * 简单的缓存，基于{@linkplain SoftReference}实现了自动垃圾回收、LRU cache
+ * <p>该缓存是线程非安全的。</p>
  *
  * @author miles.tang at 2021-01-19
  * @see <a href="https://android.googlesource.com/platform/packages/apps/Mms/+/master/src/com/android/mms/util/SimpleCache.java">SimpleCache.java</a>

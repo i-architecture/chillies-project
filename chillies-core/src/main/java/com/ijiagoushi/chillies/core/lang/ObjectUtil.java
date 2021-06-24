@@ -3,10 +3,12 @@ package com.ijiagoushi.chillies.core.lang;
 import com.ijiagoushi.chillies.core.exceptions.ClassNotFoundRuntimeException;
 import com.ijiagoushi.chillies.core.exceptions.IoRuntimeException;
 import com.ijiagoushi.chillies.core.io.FastByteArrayOutputStream;
+import org.jetbrains.annotations.NotNull;
 
 import java.io.*;
 import java.nio.Buffer;
 import java.util.*;
+import java.util.function.Supplier;
 
 /**
  * Object Utilities
@@ -50,8 +52,41 @@ public class ObjectUtil {
         return false;
     }
 
+    /**
+     * <p>判断对象是否为不为空或{@code null}</p>
+     * 支持以下类型
+     * <ul>
+     *     <li>{@linkplain CharSequence}长度是否为0</li>
+     *     <li>{@code Array}数组长度是否为0</li>
+     *     <li>{@linkplain Collection}集合是否为空</li>
+     *     <li>{@linkplain Map>是否为空</li>
+     * </ul>
+     *
+     * @param obj 被判断的对象
+     * @return 是否为空
+     */
     public static boolean isNotEmpty(Object obj) {
         return !isEmpty(obj);
+    }
+
+    /**
+     * <p>判断数组中任意一个元素为空或{@code null}</p>
+     * 数组本身为空或{@code null}，数组的元素支持如下类型：
+     * <ul>
+     *     <li>{@linkplain CharSequence}长度是否为0</li>
+     *     <li>{@code Array}数组长度是否为0</li>
+     *     <li>{@linkplain Collection}集合是否为空</li>
+     *     <li>{@linkplain Map>是否为空</li>
+     * </ul>
+     *
+     * @param objArray
+     * @return
+     */
+    public static boolean isAnyEmpty(Object... objArray) {
+        if (ArrayUtil.isEmpty(objArray)) {
+            return true;
+        }
+        return Arrays.stream(objArray).anyMatch(ObjectUtil::isEmpty);
     }
 
     /**
@@ -62,6 +97,24 @@ public class ObjectUtil {
      */
     public static boolean isNull(final Object obj) {
         return Objects.isNull(obj);
+    }
+
+    /**
+     * 判断数组的任意一个元素是否为{@code null}
+     *
+     * @param objArray
+     * @return
+     */
+    public static boolean isAnyNull(final Object... objArray) {
+        if (objArray == null || objArray.length == 0) {
+            return true;
+        }
+        for (Object obj : objArray) {
+            if (isNull(obj)) {
+                return true;
+            }
+        }
+        return false;
     }
 
     /**
@@ -264,6 +317,27 @@ public class ObjectUtil {
      */
     public static <T> T getIfNull(final T obj, final T defaultValue) {
         return (obj == null) ? defaultValue : obj;
+    }
+
+    /**
+     * 如果给定对象为{@code null}返回默认值
+     *
+     * <pre>
+     * ObjectUtil.getIfNull(null, null)      报错
+     * ObjectUtil.getIfNull(null, () -> {return null;})        = null
+     * ObjectUtil.getIfNull(null, () -> {return "zz"})      = "zz"
+     * ObjectUtil.getIfNull("abc", () -> {return "*";})        = "abc"
+     * ObjectUtil.getIfNull(Boolean.TRUE, *) = Boolean.TRUE
+     * </pre>
+     *
+     * @param obj      被检查对象，可能为{@code null}
+     * @param supplier 被检查对象为{@code null}返回的提供器的函数值，不可以为{@code null}
+     * @param <T>      对象类型
+     * @return 被检查对象为{@code null}返回默认值，否则返回原值
+     */
+    public static <T> T getIfNull(final T obj, @NotNull Supplier<T> supplier) {
+        Preconditions.requireNonNull(supplier, "supplier");
+        return (obj == null) ? supplier.get() : obj;
     }
 
 }

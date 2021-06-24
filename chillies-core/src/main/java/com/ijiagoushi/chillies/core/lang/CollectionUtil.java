@@ -217,7 +217,7 @@ public class CollectionUtil {
         final String _keySeparator = keySeparator;
         return keys.stream().map(key -> {
             String value = data.get(key);
-            if (ignoreNull && key != null && value != null) {
+            if (ignoreNull && (key == null || value == null)) {
                 return null;
             }
             return key + _keySeparator + value;

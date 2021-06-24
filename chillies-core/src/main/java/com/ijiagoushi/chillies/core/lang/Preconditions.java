@@ -100,7 +100,7 @@ public class Preconditions {
      */
     public static <T> T requireNotEmpty(final T reference,  final String message) {
         if (ObjectUtil.isEmpty(reference)) {
-            if (reference == null) {
+            if (message == null) {
                 throw new IllegalArgumentException();
             }
             throw new IllegalArgumentException(message);

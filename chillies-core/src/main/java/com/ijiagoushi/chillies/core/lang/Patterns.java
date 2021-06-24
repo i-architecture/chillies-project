@@ -127,6 +127,14 @@ public class Patterns {
      */
     public static final Pattern MAC_ADDR = Pattern.compile("^((([a-f0-9]{2}:){5})|(([a-f0-9]{2}-){5}))[a-f0-9]{2}$", Pattern.CASE_INSENSITIVE);
 
+    /**
+     * 时间正则，如
+     * 12:00
+     * 12:00:00
+     * 9:3
+     */
+    public static final Pattern TIME = Pattern.compile("^\\d{1,2}:\\d{1,2}(:\\d{1,2})?$");
+
     // ---
 
     /**
