@@ -3,6 +3,8 @@ package com.ijiagoushi.chillies.json.gson;
 import com.google.gson.Gson;
 import com.ijiagoushi.chillies.json.Handler;
 import com.ijiagoushi.chillies.json.JSONRuntimeException;
+import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 import java.io.Reader;
 import java.lang.reflect.Type;
@@ -25,8 +27,8 @@ public class GsonHandler implements Handler {
      * @throws JSONRuntimeException 序列化出现异常
      */
     @Override
-    public String serialize(Object src, Type typeOfT) throws JSONRuntimeException {
-        return gson.toJson(src, typeOfT);
+    public String serialize(@NotNull Object src, @Nullable Type typeOfT) throws JSONRuntimeException {
+        return (typeOfT == null) ? gson.toJson(src) : gson.toJson(src, typeOfT);
     }
 
     /**
