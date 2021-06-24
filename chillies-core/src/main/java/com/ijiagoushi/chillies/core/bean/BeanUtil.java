@@ -2,6 +2,7 @@ package com.ijiagoushi.chillies.core.bean;
 
 import com.ijiagoushi.chillies.core.exceptions.BeanException;
 import com.ijiagoushi.chillies.core.lang.Preconditions;
+import com.ijiagoushi.chillies.core.lang.StringUtil;
 import com.ijiagoushi.chillies.core.utils.ClassUtil;
 import com.ijiagoushi.chillies.core.utils.ReflectUtil;
 import org.jetbrains.annotations.NotNull;
@@ -237,26 +238,42 @@ public class BeanUtil {
         final CopyOption finalCo = copyOption;
         Map<String, PropertyDescriptor> propertyDescriptorMap = getPropertyDescriptorMap(target.getClass());
         source.forEach((key, value) -> {
+            if (finalCo.getIgnoreProperties().contains(key)) {
+                return;
+            }
+            PropertyDescriptor propertyDescriptor = propertyDescriptorMap.get(key);
+            if (propertyDescriptor == null) {
+                return;
+            }
+            Method writeMethod = propertyDescriptor.getWriteMethod();
+            if (writeMethod == null) {
+                return;
+            }
             if (value == null) {
                 if (!finalCo.isIgnoreNullValue()) {
-                    if (!finalCo.getIgnoreProperties().contains(key)) {
-                        PropertyDescriptor propertyDescriptor = propertyDescriptorMap.get(key);
-                        Method writeMethod = propertyDescriptor.getWriteMethod();
-                        if (writeMethod != null) {
-                            ReflectUtil.invoke(writeMethod, target, new Object[]{null});
-                        }
-                    }
+                    ReflectUtil.invoke(writeMethod, target, new Object[]{null});
                 }
             } else {
-                if (!finalCo.getIgnoreProperties().contains(key)) {
-                    PropertyDescriptor propertyDescriptor = propertyDescriptorMap.get(key);
-                    Method writeMethod = propertyDescriptor.getWriteMethod();
-                    if (writeMethod != null) {
+                if (value instanceof String) {
+                    String str = (String) value;
+                    if (StringUtil.hasLength(str) || !finalCo.isIgnoreEmptyString()) {
                         ReflectUtil.invoke(writeMethod, target, value);
                     }
+                } else {
+                    ReflectUtil.invoke(writeMethod, target, value);
                 }
             }
         });
+    }
+
+    /**
+     * 将Javabean对象转为Map,其中值的类型为{@code String}
+     *
+     * @param bean 对象
+     * @return Map对象
+     */
+    public static Map<String, String> toMapAsValueString(Object bean) {
+        return toMapAsValueString(bean, true);
     }
 
     /**
@@ -353,36 +370,49 @@ public class BeanUtil {
                 final CopyOption finalCo = copyOption;
                 final Map<String, PropertyDescriptor> targetPdMap = getPropertyDescriptorMap(target.getClass());
                 getPropertyDescriptorMap(source.getClass()).forEach((key, sourcePd) -> {
+                    if (finalCo.getIgnoreProperties().contains(key)) {
+                        return;
+                    }
+                    PropertyDescriptor targetPd = targetPdMap.get(key);
+                    if (targetPd == null || targetPd.getWriteMethod() == null) {
+                        return;
+                    }
                     Object value = ReflectUtil.invoke(sourcePd.getReadMethod(), source);
                     if (value == null) {
                         if (!finalCo.isIgnoreNullValue()) {
-                            PropertyDescriptor targetPd = targetPdMap.get(key);
-                            if (targetPd != null) {
-                                ReflectUtil.invoke(targetPd.getWriteMethod(), target, new Object[]{null});
-                            }
+                            ReflectUtil.invoke(targetPd.getWriteMethod(), target, new Object[]{null});
                         }
-                    } else if (!finalCo.getIgnoreProperties().contains(key)) {
-                        PropertyDescriptor targetPd = targetPdMap.get(key);
-                        if (targetPd != null) {
+                    } else {
+                        if (value instanceof String) {
+                            String str = (String) value;
+                            if (StringUtil.hasLength(str) || !finalCo.isIgnoreEmptyString()) {
+                                ReflectUtil.invoke(targetPd.getWriteMethod(), target, value);
+                            }
+                        } else {
                             ReflectUtil.invoke(targetPd.getWriteMethod(), target, value);
                         }
                     }
                 });
-
             }
         }
     }
 
 
     private static void copyToMap(String key, Object value, Map<String, Object> targetMap, CopyOption copyOption) {
+        if (copyOption.getIgnoreProperties().contains(key)) {
+            return;
+        }
         if (value == null) {
             if (!copyOption.isIgnoreNullValue()) {
-                if (!copyOption.getIgnoreProperties().contains(key)) {
-                    targetMap.put(key, null);
-                }
+                targetMap.put(key, null);
             }
         } else {
-            if (!copyOption.getIgnoreProperties().contains(key)) {
+            if (value instanceof String) {
+                String str = (String) value;
+                if (StringUtil.hasLength(str) || !copyOption.isIgnoreEmptyString()) {
+                    targetMap.put(key, value);
+                }
+            } else {
                 targetMap.put(key, value);
             }
         }

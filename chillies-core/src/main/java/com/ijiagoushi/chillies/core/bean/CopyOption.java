@@ -1,10 +1,8 @@
 package com.ijiagoushi.chillies.core.bean;
 
 import com.ijiagoushi.chillies.core.lang.ArrayUtil;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
-import lombok.ToString;
+import lombok.*;
+import lombok.experimental.SuperBuilder;
 
 import java.io.Serializable;
 import java.util.ArrayList;
@@ -21,16 +19,25 @@ import java.util.List;
 @Setter
 @NoArgsConstructor
 @ToString
+@SuperBuilder
 public class CopyOption implements Serializable {
 
     /**
      * 是否忽略空值，当源对象的值为null时，true: 忽略而不注入此值，false: 注入null
      */
-    private boolean ignoreNullValue;
+    @Builder.Default
+    private boolean ignoreNullValue = false;
+
+    /**
+     * 忽略空字符串
+     */
+    @Builder.Default
+    private boolean ignoreEmptyString = false;
 
     /**
      * 忽略的目标对象中属性列表，设置一个属性列表，不拷贝这些属性值
      */
+    @Builder.Default
     private List<String> ignoreProperties = new ArrayList<>();
 
     public CopyOption(boolean ignoreNullValue) {
