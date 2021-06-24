@@ -1639,6 +1639,42 @@ public class ArrayUtil {
         return max;
     }
 
+    /**
+     * 返回数组中指定元素所在位置，未找到返回{@link #INDEX_NOT_FOUND}
+     *
+     * @param <T>     数组类型
+     * @param array   数组
+     * @param element 被检查的元素
+     * @return 数组中指定元素所在位置，未找到返回{@link #INDEX_NOT_FOUND}
+     */
+    public static <T> int indexOf(T[] array, Object element) {
+        if (null != array) {
+            for (int i = 0; i < array.length; i++) {
+                if (ObjectUtil.equals(element, array[i])) {
+                    return i;
+                }
+            }
+        }
+        return INDEX_NOT_FOUND;
+    }
+
+    /**
+     * 返回数组中指定元素所在位置，未找到返回{@link #INDEX_NOT_FOUND}
+     *
+     * @param array   数组
+     * @param element 被检查的元素
+     * @return 数组中指定元素所在位置，未找到返回{@link #INDEX_NOT_FOUND}
+     */
+    public static int indexOf(long[] array, long element) {
+        if (null != array) {
+            for (int i = 0; i < array.length; i++) {
+                if (element == array[i]) {
+                    return i;
+                }
+            }
+        }
+        return INDEX_NOT_FOUND;
+    }
 
 //
 //    /**
