@@ -14,7 +14,7 @@ import java.util.regex.Pattern;
 public class IpUtil {
 
     private IpUtil() {
-        throw new AssertionError("No com.jishukezhan.servlet3.IpUtil instances for you!");
+        throw new AssertionError("Cannot create instance!");
     }
 
     public static final String[] HEADERS_TO_TRY = {
