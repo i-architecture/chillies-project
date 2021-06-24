@@ -1,15 +1,14 @@
 package com.ijiagoushi.chillies.core.utils;
 
-import com.ijiagoushi.chillies.core.lang.ArrayUtil;
-import com.ijiagoushi.chillies.core.lang.Preconditions;
+import com.ijiagoushi.chillies.core.lang.*;
+import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
+import java.lang.reflect.Field;
 import java.lang.reflect.Method;
 import java.lang.reflect.Modifier;
 import java.lang.reflect.Type;
-import java.util.Arrays;
-import java.util.IdentityHashMap;
-import java.util.Map;
+import java.util.*;
 import java.util.function.Function;
 
 /**
@@ -29,6 +28,8 @@ public class ClassUtil {
      * type as value, for example: int.class -> Integer.class.
      */
     static final Map<Class<?>, Class<?>> PRIMITIVE_TYPE_TO_WRAPPER_MAP = new IdentityHashMap<>(8);
+
+    private static final SimpleCache<Class<?>, List<Field>> declaredFieldsCache = new SimpleCache<>(255);
 
     static {
         PRIMITIVE_WRAPPER_TYPE_MAP.put(Boolean.class, boolean.class);
@@ -250,6 +251,99 @@ public class ClassUtil {
     private static Class<?> getGenericType(Class<?> clazz, int index) {
         Type genericType = TypeUtil.getGenericType(clazz, index);
         return TypeUtil.getRawType(genericType);
+    }
+
+
+    /**
+     * 获取Class定义的属性列表
+     *
+     * @param targetClass 目标类型
+     * @return 返回属性列表
+     */
+    @NotNull
+    public static List<Field> getDeclaredFields(@Nullable Class<?> targetClass) {
+        if (targetClass == null) {
+            return Collections.emptyList();
+        }
+        List<Field> declaredFields = declaredFieldsCache.get(targetClass);
+        if (declaredFields == null) {
+            declaredFields = new ArrayList<>();
+            Class<?> currentClass = targetClass;
+            Field[] fields;
+            while (currentClass != null) {
+                fields = currentClass.getDeclaredFields();
+                Collections.addAll(declaredFields, fields);
+                currentClass = currentClass.getSuperclass();
+            }
+//            logger.debug(" Reflect fields success,then put then into cache container.targetClass->{},fields->{}",
+//                    targetClass, declaredFields);
+            declaredFieldsCache.put(targetClass, declaredFields.size() == 0 ? Collections.emptyList() : declaredFields);
+        } else {
+//            logger.debug(" ===> The cache exist class [{}] reflection.", targetClass.getName());
+        }
+        return declaredFields;
+    }
+
+    /**
+     * 根据过滤器过滤属性,最后返回类解析的属性列表
+     *
+     * @param targetClass  目标类型
+     * @param fieldFilters 过滤器
+     * @return 过滤后的属性列表
+     */
+    public static List<Field> getDeclaredFields(Class<?> targetClass, final FieldFilter... fieldFilters) {
+        List<Field> fieldList = getDeclaredFields(targetClass);
+        if (CollectionUtil.isEmpty(fieldList)) return fieldList;
+        if (ArrayUtil.isEmpty(fieldFilters)) return fieldList;
+
+        List<Field> filterFieldList = new ArrayList<>(fieldList.size());
+        boolean filter;
+        for (Field field : fieldList) {
+            filter = false;
+            for (FieldFilter fieldFilter : fieldFilters) {
+                if (fieldFilter.accept(field)) {
+                    filter = true;
+                    break;
+                }
+            }
+            if (!filter) filterFieldList.add(field);
+        }
+        return filterFieldList;
+    }
+
+    /**
+     * 根据{@code fieldName}在{@code targetClass}查找，支持父类的属性查找。
+     *
+     * @param targetClass the class to introspect.
+     * @param fieldName   the name of the field.
+     * @return the Field object, or {@code null} if not found.
+     */
+    public static Field findField(Class<?> targetClass, String fieldName) {
+        return findField(targetClass, fieldName, null);
+    }
+
+    /**
+     * 根据{@code fieldName}或{@code fieldType}在{@code targetClass}查找，支持父类的属性查找。
+     *
+     * @param targetClass the class to introspect.
+     * @param fieldName   the name of the field.
+     * @param fieldType   the type of the field.
+     * @return the Field object, or {@code null} if not found.
+     */
+    public static Field findField(Class<?> targetClass, String fieldName, Class<?> fieldType) {
+        if (targetClass == null || (StringUtil.isEmpty(fieldName) && fieldType == null)) {
+            return null;
+        }
+        Class<?> searchType = targetClass;
+        while (Object.class != searchType && searchType != null) {
+            List<Field> declaredFields = getDeclaredFields(searchType);
+            for (Field declaredField : declaredFields) {
+                if ((fieldName == null || fieldName.equals(declaredField.getName())) &&
+                        (fieldType == null || fieldType.equals(declaredField.getType()))) return declaredField;
+            }
+            searchType = searchType.getSuperclass();
+        }
+        return null;
     }
 
 }
