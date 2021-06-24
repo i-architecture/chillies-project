@@ -1,7 +1,7 @@
 package com.ijiagoushi.chillies.core.id;
 
 import com.ijiagoushi.chillies.core.date.DatePattern;
-import com.ijiagoushi.chillies.core.date.DateUtil;
+import com.ijiagoushi.chillies.core.date.LocalDateTimeUtil;
 import com.ijiagoushi.chillies.core.lang.StringUtil;
 
 import java.util.concurrent.atomic.AtomicInteger;
@@ -24,7 +24,7 @@ public class DateIdGenerator implements IdGenerator<Object> {
      */
     @Override
     public String get(Object obj) {
-        String datetimePrefix = DateUtil.format(DatePattern.PURE_DATETIME_MS_FORMATTER);
+        String datetimePrefix = LocalDateTimeUtil.format(DatePattern.PURE_DATETIME_MS_FORMATTER);
         return datetimePrefix + StringUtil.DASH + getSeqId() + getRandomString(8);
     }
 
