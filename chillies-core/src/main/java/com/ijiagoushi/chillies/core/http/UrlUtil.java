@@ -8,6 +8,7 @@ import com.ijiagoushi.chillies.core.lang.StringUtil;
 import com.ijiagoushi.chillies.core.map.MultiValueLinkedMap;
 import com.ijiagoushi.chillies.core.map.MultiValueMap;
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 import java.io.File;
 import java.io.IOException;
@@ -15,6 +16,7 @@ import java.io.InputStream;
 import java.io.UnsupportedEncodingException;
 import java.net.*;
 import java.nio.charset.Charset;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.function.BiConsumer;
@@ -72,105 +74,6 @@ public class UrlUtil {
         } catch (UnsupportedEncodingException e) {
             //never happen
             throw new IllegalArgumentException(e);
-        }
-    }
-
-    /**
-     * 为url增加请求参数
-     *
-     * @param url   原始的请求地址
-     * @param name  参数名
-     * @param value 参数值
-     * @return 返回追加了参数的地址
-     */
-    public static String addParam(String url, String name, String value) {
-        return addParam(url, name, value, null);
-    }
-
-    /**
-     * 为url增加请求参数
-     *
-     * @param url      原始的请求地址
-     * @param name     参数名
-     * @param value    参数值
-     * @param encoding 编码
-     * @return 返回追加了参数的地址
-     */
-    public static String addParam(String url, String name, String value, String encoding) {
-        if (StringUtil.isEmpty(url)) {
-            return StringUtil.EMPTY_STRING;
-        }
-        if (StringUtil.isEmpty(name) || StringUtil.isEmpty(value)) {
-            return url;
-        }
-        if (encoding == null) {
-            encoding = CharsetUtil.UTF_8_VALUE;
-        }
-        String queryString = name + "=" + encode(value, encoding);
-        if (url.contains("?")) {
-            return url + "&" + queryString;
-        } else {
-            return url + "?" + queryString;
-        }
-    }
-
-    /**
-     * 为url增加请求参数
-     *
-     * @param url    原始的请求地址
-     * @param params 参数
-     * @return 返回追加了参数的地址
-     */
-    public static String addParams(String url, Map<CharSequence, ?> params) {
-        return addParams(url, params, null);
-    }
-
-    /**
-     * 为url增加请求参数
-     *
-     * @param url      原始的请求地址
-     * @param params   参数
-     * @param encoding 编码
-     * @return 返回追加了参数的地址
-     */
-    public static String addParams(String url, Map<? extends CharSequence, ?> params, String encoding) {
-        if (StringUtil.isEmpty(url)) {
-            return StringUtil.EMPTY_STRING;
-        }
-        if (CollectionUtil.isEmpty(params)) {
-            return url;
-        }
-        if (encoding == null) {
-            encoding = CharsetUtil.UTF_8_VALUE;
-        }
-        final String charset = encoding;
-
-        StringBuilder queryParamBuilder = new StringBuilder();
-
-        params.forEach((BiConsumer<CharSequence, Object>) (name, value) -> {
-            if (StringUtil.isEmpty(name) || value == null) {
-                return;
-            }
-            if (value instanceof Iterable) {
-                ((Iterable<?>) value).forEach((Consumer<Object>) subValue -> queryParamBuilder
-                        .append(name.toString())
-                        .append("=")
-                        .append(encode(subValue.toString(), charset))
-                        .append("&"));
-            } else {
-                // 处理的不够细致
-                queryParamBuilder
-                        .append(name.toString())
-                        .append("=")
-                        .append(encode(value.toString(), charset))
-                        .append("&");
-            }
-        });
-        queryParamBuilder.deleteCharAt(queryParamBuilder.length() - 1);
-        if (url.contains("?")) {
-            return url + "&" + queryParamBuilder.toString();
-        } else {
-            return url + "?" + queryParamBuilder.toString();
         }
     }
 
@@ -256,7 +159,7 @@ public class UrlUtil {
      * @return 返回Map对象
      */
     @NotNull
-    public static MultiValueMap<String, String> parseUrlParams(@NotNull String urlParamStr) {
+    public static MultiValueMap<String, String> parseByUrlQueryString(@NotNull String urlParamStr) {
         MultiValueMap<String, String> multiValueMap = new MultiValueLinkedMap<>();
         if (urlParamStr.length() == 0) {
             return multiValueMap;
@@ -271,13 +174,133 @@ public class UrlUtil {
             if (StringUtil.hasText(urlParam)) {
                 array = StringUtil.split(urlParam, StringUtil.EQUALS, true, true);
                 if (array.length == 2) {
-                    multiValueMap.add(array[0], array[1]);
+                    multiValueMap.add(array[0], decode(array[1]));
                 } else {
                     multiValueMap.add(array[0], null);
                 }
             }
         }
         return multiValueMap;
+    }
+
+    /**
+     * Map参数转为Url参数，默认采用{@code UTF-8}编码
+     *
+     * @param params 参数
+     * @return 符合URL规范的参数
+     */
+    public static String generateByUrlQueryString(Map<? extends CharSequence, ?> params) {
+        return generateByUrlQueryString(params, null);
+    }
+
+    /**
+     * Map参数转为Url参数
+     *
+     * @param params   参数
+     * @param encoding 编码，可以为空，默认是{@code UTF-8}
+     * @return 符合URL规范的参数
+     */
+    public static String generateByUrlQueryString(Map<? extends CharSequence, ?> params, @Nullable Charset encoding) {
+        if (CollectionUtil.isEmpty(params)) {
+            return StringUtil.EMPTY_STRING;
+        }
+        StringBuilder builder = new StringBuilder();
+        final Charset charset = CharsetUtil.getCharset(encoding, CharsetUtil.UTF_8);
+        params.forEach((BiConsumer<CharSequence, Object>) (cs, val) -> {
+            if (StringUtil.isEmpty(cs) || val == null) {
+                return;
+            }
+            if (val instanceof Iterable) {
+                ((Iterable<?>) val).forEach((Consumer<Object>) value -> appendNameAndValue(builder, cs, value, charset));
+            } else if (val instanceof Iterator<?>) {
+                ((Iterator<?>) val).forEachRemaining((Consumer<Object>) value -> appendNameAndValue(builder, cs, value, charset));
+            } else {
+                appendNameAndValue(builder, cs, val, charset);
+            }
+        });
+        builder.deleteCharAt(builder.length() - 1);
+        return builder.toString();
+    }
+
+    private static void appendNameAndValue(StringBuilder builder, CharSequence name, Object value, Charset charset) {
+        builder.append(name.toString())
+                .append(StringUtil.EQUALS)
+                .append(encode(value.toString(), charset))
+                .append(StringUtil.AMP);
+    }
+
+    /**
+     * 为url增加请求参数
+     *
+     * @param url   原始的请求地址
+     * @param name  参数名
+     * @param value 参数值
+     * @return 返回追加了参数的地址
+     */
+    public static String addParam(String url, String name, String value) {
+        return addParam(url, name, value, null);
+    }
+
+    /**
+     * 为url增加请求参数
+     *
+     * @param url      原始的请求地址
+     * @param name     参数名
+     * @param value    参数值
+     * @param encoding 编码
+     * @return 返回追加了参数的地址
+     */
+    public static String addParam(String url, String name, String value, String encoding) {
+        if (StringUtil.isEmpty(url)) {
+            return StringUtil.EMPTY_STRING;
+        }
+        if (StringUtil.isEmpty(name) || StringUtil.isEmpty(value)) {
+            return url;
+        }
+        if (encoding == null) {
+            encoding = CharsetUtil.UTF_8_VALUE;
+        }
+        String queryString = name + "=" + encode(value, encoding);
+        if (url.contains("?")) {
+            return url + "&" + queryString;
+        } else {
+            return url + "?" + queryString;
+        }
+    }
+
+    /**
+     * 为url增加请求参数
+     *
+     * @param url    原始的请求地址
+     * @param params 参数
+     * @return 返回追加了参数的地址
+     */
+    public static String addParams(String url, Map<? extends CharSequence, ?> params) {
+        return addParams(url, params, null);
+    }
+
+    /**
+     * 为url增加请求参数
+     *
+     * @param url      原始的请求地址
+     * @param params   参数
+     * @param encoding 编码
+     * @return 返回追加了参数的地址
+     */
+    public static String addParams(String url, Map<? extends CharSequence, ?> params, String encoding) {
+        if (StringUtil.isEmpty(url)) {
+            return StringUtil.EMPTY_STRING;
+        }
+        if (CollectionUtil.isEmpty(params)) {
+            return url;
+        }
+
+        String queryString = generateByUrlQueryString(params, CharsetUtil.forName(encoding));
+        if (url.contains("?")) {
+            return url + "&" + queryString;
+        } else {
+            return url + "?" + queryString;
+        }
     }
 
 }
