@@ -1,5 +1,6 @@
 package com.ijiagoushi.chillies.core.exceptions;
 
+import java.text.ParseException;
 import java.time.temporal.UnsupportedTemporalTypeException;
 
 /**
@@ -16,6 +17,10 @@ public class DateRuntimeException extends GenericRuntimeException {
     }
 
     public DateRuntimeException(UnsupportedTemporalTypeException cause) {
+        super(cause);
+    }
+
+    public DateRuntimeException(ParseException cause) {
         super(cause);
     }
 

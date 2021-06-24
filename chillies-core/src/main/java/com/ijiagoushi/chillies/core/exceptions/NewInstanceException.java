@@ -13,7 +13,7 @@ public class NewInstanceException extends GenericRuntimeException {
      *
      * @param e 异常
      */
-    public NewInstanceException(ReflectiveOperationException e) {
+    public NewInstanceException(Exception e) {
         super(e);
     }
 

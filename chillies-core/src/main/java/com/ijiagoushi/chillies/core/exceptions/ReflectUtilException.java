@@ -20,7 +20,17 @@ public class ReflectUtilException extends GenericRuntimeException {
         super(StringUtil.format(template, params));
     }
 
-    public ReflectUtilException(ReflectiveOperationException e) {
+    /**
+     * 构造器
+     *
+     * @param message 错误信息
+     * @param cause   异常信息
+     */
+    public ReflectUtilException(String message, Exception cause) {
+        super(message, cause);
+    }
+
+    public ReflectUtilException(Exception e) {
         super(e);
     }
 
