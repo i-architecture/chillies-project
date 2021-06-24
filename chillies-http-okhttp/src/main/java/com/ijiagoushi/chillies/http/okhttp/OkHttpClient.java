@@ -119,6 +119,8 @@ public class OkHttpClient implements HttpClient {
             return toHttpResponse(okResponse, request).newBuilder().request(request).build();
         } catch (IOException e) {
             throw new IoRuntimeException(e);
+        } finally {
+            Utils.closeParts(request.body());
         }
     }
 
@@ -215,10 +217,10 @@ public class OkHttpClient implements HttpClient {
 
     private static HttpResponse toHttpResponse(okhttp3.Response okResponse, HttpRequest input) {
         return HttpResponse.builder()
-                .status(okResponse.code())
+                .rawStatus(okResponse.code())
                 .reason(okResponse.message())
                 .request(input)
-                .headers(okResponse.headers().toMultimap())
+                .headers(new HttpHeaders(okResponse.headers().toMultimap()))
                 .body(toBody(okResponse))
                 .build();
     }
