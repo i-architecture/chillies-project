@@ -16,8 +16,20 @@ public class BigDecimalConverter extends AbstractConverter<Object, BigDecimal> {
     protected BigDecimal execInternal(Object value) {
         if (value instanceof Number) {
             return NumberUtil.createBigDecimal((Number) value);
+        } else if (value instanceof Boolean) {
+            return BigDecimal.valueOf(((Boolean) value) ? 1 : 0);
         }
         return NumberUtil.createBigDecimal(execToStr(value));
+    }
+
+    /**
+     * 获取此类实现类的反省类型
+     *
+     * @return 此类的泛型类型，坑你为{@code null}
+     */
+    @Override
+    public Class<BigDecimal> getTargetClass() {
+        return BigDecimal.class;
     }
 
     private static class Holder {

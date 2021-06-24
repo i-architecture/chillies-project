@@ -37,6 +37,16 @@ public class IntegerConverter extends AbstractConverter<Object, Integer> {
         throw new ConverterRuntimeException(3, StringUtil.format("Can't cast {} to java.lang.Integer", input));
     }
 
+    /**
+     * 获取此类实现类的反省类型
+     *
+     * @return 此类的泛型类型，坑你为{@code null}
+     */
+    @Override
+    public Class<Integer> getTargetClass() {
+        return Integer.class;
+    }
+
     @Override
     public String toString() {
         return "IntegerConverter";

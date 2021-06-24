@@ -23,6 +23,16 @@ public class CharacterConverter extends AbstractConverter<Object, Character> {
         return null;
     }
 
+    /**
+     * 获取此类实现类的反省类型
+     *
+     * @return 此类的泛型类型，坑你为{@code null}
+     */
+    @Override
+    public Class<Character> getTargetClass() {
+        return Character.class;
+    }
+
     private static class Holder {
         static final CharacterConverter INSTANCE = new CharacterConverter();
     }

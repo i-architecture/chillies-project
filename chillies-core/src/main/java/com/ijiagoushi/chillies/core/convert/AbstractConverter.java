@@ -4,7 +4,6 @@ import com.ijiagoushi.chillies.core.exceptions.ConverterRuntimeException;
 import com.ijiagoushi.chillies.core.lang.ArrayUtil;
 import com.ijiagoushi.chillies.core.lang.CharUtil;
 import com.ijiagoushi.chillies.core.lang.StringUtil;
-import com.ijiagoushi.chillies.core.utils.ClassUtil;
 
 import java.io.Serializable;
 import java.util.Map;
@@ -63,14 +62,11 @@ public abstract class AbstractConverter<S, T> implements Converter<S, T>, Serial
     protected abstract T execInternal(Object value);
 
     /**
-     * 获取此类实现类的反省类型
+     * 返回实际目标类型
      *
-     * @return 此类的泛型类型，坑你为{@code null}
+     * @return 实际目标类型
      */
-    @SuppressWarnings("unchecked")
-    public Class<T> getTargetClass() {
-        return (Class<T>) ClassUtil.getGenericType(getClass());
-    }
+    public abstract Class<T> getTargetClass();
 
     /**
      * 值转为String，用于内部转换中需要使用String中转的情况<br>

@@ -23,6 +23,16 @@ public class BigIntegerConverter extends AbstractConverter<Object, BigInteger> {
         }
     }
 
+    /**
+     * 获取此类实现类的反省类型
+     *
+     * @return 此类的泛型类型，坑你为{@code null}
+     */
+    @Override
+    public Class<BigInteger> getTargetClass() {
+        return BigInteger.class;
+    }
+
     private static class Holder {
         static final BigIntegerConverter INSTANCE = new BigIntegerConverter();
     }

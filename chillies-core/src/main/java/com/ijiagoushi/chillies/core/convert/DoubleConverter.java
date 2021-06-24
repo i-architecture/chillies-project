@@ -34,6 +34,16 @@ public class DoubleConverter extends AbstractConverter<Object, Double> {
         throw new ConverterRuntimeException(3, StringUtil.format("Can't cast {} to java.lang.Double", input));
     }
 
+    /**
+     * 获取此类实现类的反省类型
+     *
+     * @return 此类的泛型类型，坑你为{@code null}
+     */
+    @Override
+    public Class<Double> getTargetClass() {
+        return Double.class;
+    }
+
     @Override
     public String toString() {
         return "DoubleConverter";

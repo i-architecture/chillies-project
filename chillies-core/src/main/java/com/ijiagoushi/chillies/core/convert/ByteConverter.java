@@ -26,6 +26,16 @@ public class ByteConverter extends AbstractConverter<Object, Byte> {
         return NumberUtil.convert(output, Byte.class);
     }
 
+    /**
+     * 获取此类实现类的反省类型
+     *
+     * @return 此类的泛型类型，坑你为{@code null}
+     */
+    @Override
+    public Class<Byte> getTargetClass() {
+        return Byte.class;
+    }
+
     @Override
     public String toString() {
         return "ByteConverter";

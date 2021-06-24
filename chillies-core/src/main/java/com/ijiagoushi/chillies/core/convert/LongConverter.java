@@ -37,6 +37,16 @@ public class LongConverter extends AbstractConverter<Object, Long> {
         throw new ConverterRuntimeException(3, StringUtil.format("Can't cast {} to java.lang.Long", input));
     }
 
+    /**
+     * 获取此类实现类的反省类型
+     *
+     * @return 此类的泛型类型，坑你为{@code null}
+     */
+    @Override
+    public Class<Long> getTargetClass() {
+        return Long.class;
+    }
+
     @Override
     public String toString() {
         return "LongConverter";

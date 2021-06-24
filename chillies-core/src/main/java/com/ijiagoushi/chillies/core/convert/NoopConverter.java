@@ -12,4 +12,14 @@ public class NoopConverter extends AbstractConverter<Object, Object> {
         return input;
     }
 
+    /**
+     * 返回实际目标类型
+     *
+     * @return 实际目标类型
+     */
+    @Override
+    public Class<Object> getTargetClass() {
+        return Object.class;
+    }
+
 }

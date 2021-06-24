@@ -28,6 +28,16 @@ public class BooleanConverter extends AbstractConverter<Object, Boolean> {
         return BooleanEvaluator.DEFAULT_TRUE_EVALUATOR.evalTrue(execToStr(value));
     }
 
+    /**
+     * 获取此类实现类的反省类型
+     *
+     * @return 此类的泛型类型，坑你为{@code null}
+     */
+    @Override
+    public Class<Boolean> getTargetClass() {
+        return Boolean.class;
+    }
+
     @Override
     public String toString() {
         return "BooleanConverter";

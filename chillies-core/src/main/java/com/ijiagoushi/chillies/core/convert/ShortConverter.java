@@ -23,6 +23,16 @@ public class ShortConverter extends AbstractConverter<Object, Short> {
         return NumberUtil.convert(output, Short.class);
     }
 
+    /**
+     * 获取此类实现类的反省类型
+     *
+     * @return 此类的泛型类型，坑你为{@code null}
+     */
+    @Override
+    public Class<Short> getTargetClass() {
+        return Short.class;
+    }
+
     @Override
     public String toString() {
         return "ShortConverter";

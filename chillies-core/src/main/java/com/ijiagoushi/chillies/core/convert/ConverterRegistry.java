@@ -54,7 +54,8 @@ public class ConverterRegistry implements Serializable {
         builtin.put(Character.class, CharacterConverter.getInstance());
         builtin.put(BigDecimal.class, BigDecimalConverter.getInstance());
         builtin.put(BigInteger.class, BigIntegerConverter.getInstance());
-
+        builtin.put(CharSequence.class, new StringConverter());
+        builtin.put(String.class, new StringConverter());
     }
 
     /**
