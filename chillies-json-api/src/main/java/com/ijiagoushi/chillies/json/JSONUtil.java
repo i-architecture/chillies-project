@@ -1,7 +1,6 @@
 package com.ijiagoushi.chillies.json;
 
 import com.ijiagoushi.chillies.core.lang.Preconditions;
-import com.ijiagoushi.chillies.core.lang.StringUtil;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -17,7 +16,7 @@ public class JSONUtil {
     /**
      * 默认JSON引擎
      */
-    private static JSON defaultJson = Factory.create().build();
+    private static final JSON DEFAULT__JSON = Factory.create().build();
 
     /**
      * 自定义的JSON引擎
@@ -40,7 +39,11 @@ public class JSONUtil {
      * @return JSON字符串或空字符串
      * @see #toJson(Object, Type)
      */
-    public static String toJson(Object src) {
+    @Nullable
+    public static String toJson(@Nullable Object src) {
+        if (src == null) {
+            return null;
+        }
         return toJson(src, src.getClass());
     }
 
@@ -51,9 +54,10 @@ public class JSONUtil {
      * @param typeOfSrc 对象的某个类型
      * @return JSON字符串或空字符串
      */
-    public static String toJson(Object src, Type typeOfSrc) {
+    @Nullable
+    public static String toJson(@Nullable Object src, @Nullable Type typeOfSrc) {
         if (src == null) {
-            return StringUtil.EMPTY_STRING;
+            return null;
         }
         return getJSON(customJson).toJson(src, typeOfSrc);
     }
@@ -66,7 +70,7 @@ public class JSONUtil {
      * @param <T>   泛型
      * @return 对象
      */
-    public static <T> T fromJson(String json, Class<T> clazz) {
+    public static <T> T fromJson(@Nullable String json, Class<T> clazz) {
         return getJSON(customJson).fromJson(json, clazz);
     }
 
@@ -78,7 +82,7 @@ public class JSONUtil {
      * @param <T>     泛型
      * @return 对象
      */
-    public static <T> T fromJson(String json, Type typeOfT) {
+    public static <T> T fromJson(@Nullable String json, Type typeOfT) {
         return getJSON(customJson).fromJson(json, typeOfT);
     }
 
@@ -89,7 +93,10 @@ public class JSONUtil {
      * @param json 指定JSON引擎
      * @return JSON字符串或空字符串
      */
-    public static String toJson(Object src, JSON json) {
+    public static String toJson(@Nullable Object src, @Nullable JSON json) {
+        if (src == null) {
+            return null;
+        }
         return toJson(src, src.getClass(), json);
     }
 
@@ -101,9 +108,9 @@ public class JSONUtil {
      * @param json      指定JSON引擎
      * @return JSON字符串或空字符串
      */
-    public static String toJson(Object src, Type typeOfSrc, JSON json) {
+    public static String toJson(@Nullable Object src, @Nullable Type typeOfSrc, @Nullable JSON json) {
         if (src == null) {
-            return StringUtil.EMPTY_STRING;
+            return null;
         }
         return getJSON(json).toJson(src, typeOfSrc);
     }
@@ -116,7 +123,7 @@ public class JSONUtil {
      * @param <T>   泛型
      * @return 对象
      */
-    public static <T> T fromJson(String text, Class<T> clazz, JSON json) {
+    public static <T> T fromJson(String text, Class<T> clazz, @Nullable JSON json) {
         return getJSON(json).fromJson(text, clazz);
     }
 
@@ -128,7 +135,7 @@ public class JSONUtil {
      * @param <T>     泛型
      * @return 对象
      */
-    public static <T> T fromJson(String text, Type typeOfT, JSON json) {
+    public static <T> T fromJson(String text, Type typeOfT, @Nullable JSON json) {
         return getJSON(json).fromJson(text, typeOfT);
     }
 
@@ -164,7 +171,7 @@ public class JSONUtil {
      * @return JSON引擎
      */
     private static JSON getJSON(JSON json) {
-        JSON result = json != null ? json : defaultJson;
+        JSON result = json != null ? json : DEFAULT__JSON;
         return Preconditions.requireNonNull(result, "JSON Provider Cannot find!");
     }
 

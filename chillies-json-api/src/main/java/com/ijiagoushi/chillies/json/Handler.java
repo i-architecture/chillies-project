@@ -1,6 +1,7 @@
 package com.ijiagoushi.chillies.json;
 
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 import java.io.Reader;
 import java.lang.reflect.Type;
@@ -15,7 +16,7 @@ public interface Handler {
      * @return JSON字符串
      * @throws JSONRuntimeException 序列化出现异常
      */
-    String serialize(@NotNull Object src, @NotNull Type typeOfT) throws JSONRuntimeException;
+    String serialize(@NotNull Object src, @Nullable Type typeOfT) throws JSONRuntimeException;
 
     /**
      * 将JSON字符串放序列化为Java对象
