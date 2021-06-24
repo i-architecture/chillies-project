@@ -3,10 +3,14 @@ package com.ijiagoushi.chillies.core.io.resource;
 import com.ijiagoushi.chillies.core.exceptions.IoRuntimeException;
 import com.ijiagoushi.chillies.core.http.UrlUtil;
 import com.ijiagoushi.chillies.core.io.FileUtil;
+import com.ijiagoushi.chillies.core.io.IOUtil;
+import com.ijiagoushi.chillies.core.lang.CharsetUtil;
 import com.ijiagoushi.chillies.core.lang.Preconditions;
+import org.jetbrains.annotations.Nullable;
 
 import java.io.File;
 import java.io.InputStream;
+import java.nio.charset.Charset;
 
 /**
  * 文件资源
@@ -47,6 +51,19 @@ public class FileResource extends UrlResource {
     @Override
     public InputStream getInputStream() throws IoRuntimeException {
         return FileUtil.openFileInputStream(file);
+    }
+
+    /**
+     * 读取并转为字符串
+     *
+     * @param encoding 指定编码，默认采用UTF-8
+     * @return 资源的内容
+     * @throws IoRuntimeException 读取资源失败时抛出异常
+     */
+    @Override
+    public String readToStr(@Nullable Charset encoding) throws IoRuntimeException {
+        Charset charset = CharsetUtil.getCharset(encoding, CharsetUtil.UTF_8);
+        return IOUtil.readToString(this.getInputStream(), charset, true);
     }
 
     /**

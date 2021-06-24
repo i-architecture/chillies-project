@@ -886,7 +886,7 @@ public class FileUtil {
      * @param fileSize 文件大小，单位为{@code Byte}
      * @return 格式化的大小
      */
-    public static String formatSizeAsString(String fileSize) {
+    public static String formatSize(String fileSize) {
         if (StringUtil.isEmpty(fileSize)) {
             return StringUtil.EMPTY_STRING;
         }
@@ -1036,7 +1036,7 @@ public class FileUtil {
         if (StringUtil.isEmpty(filename)) {
             return null;
         }
-        int extIndex = filename.lastIndexOf(".");
+        int extIndex = filename.lastIndexOf(StringUtil.DOT);
         if (extIndex == -1) {
             return null;
         }

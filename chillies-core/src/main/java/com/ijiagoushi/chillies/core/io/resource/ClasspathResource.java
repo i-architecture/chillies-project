@@ -21,12 +21,12 @@ public class ClasspathResource extends UrlResource {
     /**
      * 基于类加载器
      */
-    private ClassLoader classLoader;
+    private final ClassLoader classLoader;
 
     /**
      * 基于类
      */
-    private Class<?> clazz;
+    private final Class<?> clazz;
 
     public ClasspathResource(String path) {
         this(path, (ClassLoader) null);

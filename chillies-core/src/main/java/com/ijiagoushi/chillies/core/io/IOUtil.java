@@ -4,6 +4,7 @@ import com.ijiagoushi.chillies.core.digest.MD5Util;
 import com.ijiagoushi.chillies.core.digest.ShaUtil;
 import com.ijiagoushi.chillies.core.exceptions.IoRuntimeException;
 import com.ijiagoushi.chillies.core.lang.*;
+import org.jetbrains.annotations.Nullable;
 
 import java.io.*;
 import java.nio.channels.FileChannel;
@@ -821,4 +822,22 @@ public class IOUtil {
         }
         return null;
     }
+
+    /**
+     * 将输入流转为字节输入流
+     *
+     * @param in 原始输入流
+     * @return 字节输入流
+     */
+    public static ByteArrayInputStream toByteArrayInputStream(@Nullable InputStream in) {
+        if (in == null) {
+            return null;
+        } else if (in instanceof ByteArrayInputStream) {
+            return (ByteArrayInputStream) in;
+        } else {
+            byte[] data = readBytes(in);
+            return new ByteArrayInputStream(data);
+        }
+    }
+
 }

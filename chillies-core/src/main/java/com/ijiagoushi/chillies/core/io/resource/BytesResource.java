@@ -1,11 +1,14 @@
 package com.ijiagoushi.chillies.core.io.resource;
 
 import com.ijiagoushi.chillies.core.exceptions.IoRuntimeException;
+import com.ijiagoushi.chillies.core.lang.CharsetUtil;
+import org.jetbrains.annotations.Nullable;
 
 import java.io.ByteArrayInputStream;
 import java.io.InputStream;
 import java.io.Serializable;
 import java.net.URL;
+import java.nio.charset.Charset;
 
 /**
  * 字节资源
@@ -51,6 +54,19 @@ public class BytesResource implements Resource, Serializable {
     @Override
     public InputStream getInputStream() throws IoRuntimeException {
         return new ByteArrayInputStream(bytes);
+    }
+
+    /**
+     * 读取并转为字符串
+     *
+     * @param encoding 指定编码，默认采用UTF-8
+     * @return 资源的内容
+     * @throws IoRuntimeException 读取资源失败时抛出异常
+     */
+    @Override
+    public String readToStr(@Nullable Charset encoding) throws IoRuntimeException {
+        Charset charset = CharsetUtil.getCharset(encoding, CharsetUtil.UTF_8);
+        return new String(bytes, charset);
     }
 
     /**

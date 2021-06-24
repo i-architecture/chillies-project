@@ -18,7 +18,7 @@ public class ResourceLoader {
 
     public static final String CLASSPATH_URL_PREFIX = "classpath:";
 
-    private List<String> locationList;
+    private final List<String> locationList;
 
     public ResourceLoader() {
         this.locationList = new ArrayList<>();
