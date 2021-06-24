@@ -3,6 +3,8 @@ package com.ijiagoushi.chillies.json.fastjson;
 import com.alibaba.fastjson.JSON;
 import com.ijiagoushi.chillies.json.Handler;
 import com.ijiagoushi.chillies.json.JSONRuntimeException;
+import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 import java.io.Reader;
 import java.lang.reflect.Type;
@@ -22,7 +24,7 @@ public class FastJsonHandler implements Handler {
      */
     @Override
 
-    public String serialize(Object src, Type typeOfT) throws JSONRuntimeException {
+    public String serialize(@NotNull Object src, @Nullable Type typeOfT) throws JSONRuntimeException {
         return JSON.toJSONString(src);
     }
 
